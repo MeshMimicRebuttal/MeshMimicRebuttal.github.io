@@ -22,6 +22,15 @@
   <script src="./template/bulma-carousel.min.js.下载"></script>
   <script src="./template/bulma-slider.min.js.下载"></script>
   <script src="./template/index.js.下载"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"
+    }
+  }
+  </script>
 
   <link rel="icon" href="resources/icon.png">
 
@@ -280,6 +289,75 @@
       min-width: 5rem;
       text-align: center;
     }
+
+    @keyframes ic-spin { to { transform: rotate(360deg); } }
+
+    .ic-ctrl-btn {
+      background: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.15s;
+      user-select: none;
+    }
+
+    .ic-ctrl-btn:hover {
+      background: #e5e7eb;
+    }
+
+    #ic-viewer canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      border-radius: 12px;
+    }
+
+    .ic-scene-btn {
+      background: #ffffff;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      padding: 0.4rem 1.25rem;
+      border-radius: 999px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .ic-scene-btn:hover {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+    }
+
+    .ic-scene-btn.is-active {
+      background: #1f2937;
+      color: #ffffff;
+      border-color: #1f2937;
+    }
+
+    #ic-controls-bar input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      outline: none;
+    }
+
+    #ic-controls-bar input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #4f46e5;
+      cursor: pointer;
+    }
   </style>
 </head>
 
@@ -460,126 +538,44 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════
-       Interactive Comparisons
+       Interactive 3D Viewer
        ════════════════════════════════════════════════════════════ -->
   <section class="section band band-b" id="interactive-comparison">
     <div class="container">
-      <h2 class="title is-2" style="text-align: center;">Interactive Comparisons</h2>
-      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 1.75rem; line-height: 1.7; text-align: justify;">
-        Side-by-side comparison of <strong>MeshMimic</strong> against baseline methods across different motion categories.
-        Select a category to filter, then use the arrows to browse individual comparisons.
+      <h2 class="title is-2" style="text-align: center;">Interactive 3D Viewer</h2>
+      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 1.75rem; line-height: 1.7; text-align: center;">
+        Explore the reconstructed 3D scenes with animated human meshes from <strong>MeshMimic</strong>.<br>
+        Select a scene, <strong>orbit</strong> with left-drag, <strong>pan</strong> with right-drag, <strong>zoom</strong> with scroll.
       </p>
 
-      <!-- ── Category filter buttons ── -->
-      <div id="ic-category-buttons" style="display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: center; margin-bottom: 2rem;">
-        <button class="ic-cat-btn is-active" data-cat="all">All</button>
-        <button class="ic-cat-btn" data-cat="jump">Jump</button>
-        <button class="ic-cat-btn" data-cat="climb">Climb</button>
-        <button class="ic-cat-btn" data-cat="vault">Vault</button>
+      <!-- Scene selector buttons -->
+      <div id="ic-scene-buttons" style="display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: center; margin-bottom: 2rem;"></div>
+
+      <!-- 3D Viewer -->
+      <div id="ic-viewer-wrap" style="position: relative; width: 100%; height: 520px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(15,23,42,0.18); background: #1e1e2e;">
+        <div id="ic-viewer" style="width: 100%; height: 100%;"></div>
+        <div id="ic-viewer-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(30,30,46,0.92); color: #e2e8f0; font-size: 1.05rem; transition: opacity 0.35s; pointer-events: none;">
+          <svg id="ic-spinner" width="40" height="40" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
+            <circle cx="25" cy="25" r="20" fill="none" stroke="#818cf8" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
+          </svg>
+          <p id="ic-overlay-text" style="margin-top: 0.75rem;">Select a scene above to begin</p>
+        </div>
       </div>
 
-      <!-- ── Cards ──
-           To add a new comparison card, copy one of the blocks below,
-           set  data-cat  to the matching category string (must match a button's data-cat),
-           fill in the <source> src, labels, and caption.
-      ── -->
-      <div id="ic-stage">
-
-        <!-- ── Card: Jump Box example ── -->
-        <div class="ic-card" data-cat="jump">
-          <p class="ic-card-title">Jump Box</p>
-          <div class="ic-grid">
-            <div>
-              <div class="video-frame" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <video controls loop muted playsinline
-                       style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                  <!-- TODO: <source src="resources/comparisons/jump_box_baseline.mp4" type="video/mp4"> -->
-                </video>
-              </div>
-              <p class="ic-col-label">Baseline</p>
-            </div>
-            <div>
-              <div class="video-frame" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <video controls loop muted playsinline
-                       style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                  <!-- TODO: <source src="resources/comparisons/jump_box_ours.mp4" type="video/mp4"> -->
-                </video>
-              </div>
-              <p class="ic-col-label">MeshMimic (Ours)</p>
-            </div>
-          </div>
-          <p class="ic-caption">Placeholder — Jump Box: [add a brief description of the scene and what MeshMimic does better].</p>
+      <!-- Playback controls -->
+      <div id="ic-controls-bar" style="display: none; max-width: 100%; margin-top: 1rem; background: #fff; border-radius: 10px; padding: 0.85rem 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07);">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+          <button class="ic-ctrl-btn" id="ic-btn-prev" title="Previous frame">&#9198;</button>
+          <button class="ic-ctrl-btn" id="ic-btn-play" title="Play / Pause">&#9654;</button>
+          <button class="ic-ctrl-btn" id="ic-btn-next" title="Next frame">&#9197;</button>
+          <input type="range" id="ic-timeline" min="0" max="0" value="0" style="flex: 1; cursor: pointer;">
+          <span id="ic-frame-info" style="min-width: 6rem; text-align: right; font-size: 0.88rem; color: #4b5563; font-variant-numeric: tabular-nums;">0 / 0</span>
         </div>
-
-        <!-- ── Card: Climb Box example ── -->
-        <div class="ic-card" data-cat="climb">
-          <p class="ic-card-title">Climb Box</p>
-          <div class="ic-grid">
-            <div>
-              <div class="video-frame" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <video controls loop muted playsinline
-                       style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                  <!-- TODO: <source src="resources/comparisons/climb_box_baseline.mp4" type="video/mp4"> -->
-                </video>
-              </div>
-              <p class="ic-col-label">Baseline</p>
-            </div>
-            <div>
-              <div class="video-frame" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <video controls loop muted playsinline
-                       style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                  <!-- TODO: <source src="resources/comparisons/climb_box_ours.mp4" type="video/mp4"> -->
-                </video>
-              </div>
-              <p class="ic-col-label">MeshMimic (Ours)</p>
-            </div>
-          </div>
-          <p class="ic-caption">Placeholder — Climb Box: [add a brief description of the scene and what MeshMimic does better].</p>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem;">
+          <span style="font-size: 0.85rem; color: #6b7280;">Speed</span>
+          <input type="range" id="ic-speed" min="1" max="60" value="20" style="width: 130px; cursor: pointer;">
+          <span id="ic-speed-label" style="font-size: 0.85rem; color: #4b5563; min-width: 3.5rem;">20 FPS</span>
         </div>
-
-        <!-- ── Card: Safety Vault example ── -->
-        <div class="ic-card" data-cat="vault">
-          <p class="ic-card-title">Safety Vault</p>
-          <div class="ic-grid">
-            <div>
-              <div class="video-frame" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <video controls loop muted playsinline
-                       style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                  <!-- TODO: <source src="resources/comparisons/safety_vault_baseline.mp4" type="video/mp4"> -->
-                </video>
-              </div>
-              <p class="ic-col-label">Baseline</p>
-            </div>
-            <div>
-              <div class="video-frame" style="height: 300px; display: flex; align-items: center; justify-content: center;">
-                <video controls loop muted playsinline
-                       style="max-height: 100%; max-width: 100%; object-fit: contain;">
-                  <!-- TODO: <source src="resources/comparisons/safety_vault_ours.mp4" type="video/mp4"> -->
-                </video>
-              </div>
-              <p class="ic-col-label">MeshMimic (Ours)</p>
-            </div>
-          </div>
-          <p class="ic-caption">Placeholder — Safety Vault: [add a brief description of the scene and what MeshMimic does better].</p>
-        </div>
-
-      </div><!-- /ic-stage -->
-
-      <!-- ── Pagination ── -->
-      <div class="ic-pagination">
-        <button class="r2s2r-nav" type="button" aria-label="Previous" id="ic-prev">
-          <svg viewBox="0 0 50 80" width="18" height="18" aria-hidden="true" focusable="false">
-            <polyline fill="currentColor" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round"
-                      points="45.63,75.8 0.375,38.087 45.63,0.375"></polyline>
-          </svg>
-        </button>
-        <span class="ic-page-info" id="ic-page-info">1 / 1</span>
-        <button class="r2s2r-nav" type="button" aria-label="Next" id="ic-next">
-          <svg viewBox="0 0 50 80" width="18" height="18" aria-hidden="true" focusable="false">
-            <polyline fill="currentColor" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round"
-                      points="0.375,0.375 45.63,38.087 0.375,75.8"></polyline>
-          </svg>
-        </button>
       </div>
 
     </div>
@@ -855,75 +851,415 @@
       render();
     })();
   </script>
-  <!-- ── Interactive Comparisons logic ─────────────────────────── -->
-  <script>
-    (function () {
-      var CARDS_PER_PAGE = 1;   // change to 2 to show two cards at once
-      var currentCat  = 'all';
-      var currentPage = 0;
+  <!-- ── Interactive 3D Viewer logic ─────────────────────────── -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-      function getAllCards() {
-        return Array.from(document.querySelectorAll('#ic-stage .ic-card'));
+    const SCENES = [
+      { id: 'EMDB_20', label: 'EMDB 20' },
+      { id: 'EMDB_27', label: 'EMDB 27' },
+      { id: 'EMDB_35', label: 'EMDB 35' },
+      { id: 'EMDB_36', label: 'EMDB 36' },
+      { id: 'EMDB_40', label: 'EMDB 40' },
+      { id: 'EMDB_48', label: 'EMDB 48' },
+      { id: 'EMDB_56', label: 'EMDB 56' },
+      { id: 'EMDB_58', label: 'EMDB 58' },
+      { id: 'parkour', label: 'Parkour' },
+      { id: 'ship_man', label: 'Ship Man' },
+    ];
+
+    function npzUrl(id) {
+      return 'resources/comparison/meshmimic/' + id + '.npz';
+    }
+
+    /* ── NPY binary parser ─────────────────────────────────── */
+    function parseNpy(buf) {
+      var dv = new DataView(buf);
+      var major = dv.getUint8(6);
+      var hdrLen, hdrOff;
+      if (major >= 2) {
+        hdrLen = dv.getUint32(8, true);
+        hdrOff = 12;
+      } else {
+        hdrLen = dv.getUint16(8, true);
+        hdrOff = 10;
+      }
+      var hdr = new TextDecoder().decode(new Uint8Array(buf, hdrOff, hdrLen)).trim();
+      var dataOff = hdrOff + hdrLen;
+
+      var dm = hdr.match(/'descr'\s*:\s*'([^']+)'/);
+      var sm = hdr.match(/'shape'\s*:\s*\(([^)]*)\)/);
+      var descr = dm ? dm[1] : '';
+      var shape = sm ? sm[1].split(',').map(function(s){return s.trim();}).filter(Boolean).map(Number) : [];
+      var total = shape.length ? shape.reduce(function(a,b){return a*b;}, 1) : 1;
+
+      var raw = buf.slice(dataOff);
+
+      if (descr === '<f4' || descr === '=f4')
+        return { shape: shape, data: new Float32Array(raw, 0, total) };
+      if (descr === '<f8' || descr === '=f8')
+        return { shape: shape, data: new Float64Array(raw, 0, total) };
+      if (descr === '<i4' || descr === '=i4')
+        return { shape: shape, data: new Int32Array(raw, 0, total) };
+      if (descr === '<u4' || descr === '=u4')
+        return { shape: shape, data: new Uint32Array(raw, 0, total) };
+
+      if (descr.match(/[<|=]U/)) {
+        var cw = parseInt(descr.replace(/[<|=]U/, ''));
+        var u32 = new Uint32Array(raw, 0, total * cw);
+        var s = '';
+        for (var i = 0; i < u32.length; i++) { if (u32[i]) s += String.fromCodePoint(u32[i]); }
+        return { shape: shape, data: s };
+      }
+      if (descr.match(/[|<]S/)) {
+        return { shape: shape, data: new TextDecoder().decode(new Uint8Array(raw, 0, total)).replace(/\0+$/, '') };
       }
 
-      function getFilteredCards() {
-        return getAllCards().filter(function (c) {
-          return currentCat === 'all' || c.dataset.cat === currentCat;
-        });
+      return { shape: shape, data: new Uint8Array(raw, 0, total) };
+    }
+
+    /* ── Parse a JSZip object into typed arrays ──────────── */
+    async function parseZipToArrays(zip) {
+      var arrays = {};
+      var keys = Object.keys(zip.files);
+      for (var k = 0; k < keys.length; k++) {
+        var name = keys[k];
+        if (zip.files[name].dir) continue;
+        var key = name.replace(/\.npy$/, '');
+        var ab = await zip.files[name].async('arraybuffer');
+        try { arrays[key] = parseNpy(ab); } catch(e) { /* skip unparseable */ }
       }
+      return arrays;
+    }
 
-      function render() {
-        /* hide every card */
-        getAllCards().forEach(function (c) { c.classList.remove('is-visible'); });
-
-        var filtered   = getFilteredCards();
-        var totalPages = Math.max(1, Math.ceil(filtered.length / CARDS_PER_PAGE));
-
-        /* clamp page index */
-        if (currentPage >= totalPages) { currentPage = totalPages - 1; }
-        if (currentPage < 0)           { currentPage = 0; }
-
-        /* show current page */
-        var start = currentPage * CARDS_PER_PAGE;
-        filtered.slice(start, start + CARDS_PER_PAGE).forEach(function (c) {
-          c.classList.add('is-visible');
-        });
-
-        /* update page counter */
-        var info = document.getElementById('ic-page-info');
-        if (info) { info.textContent = (currentPage + 1) + ' / ' + totalPages; }
-
-        /* update button states */
-        var prevBtn = document.getElementById('ic-prev');
-        var nextBtn = document.getElementById('ic-next');
-        if (prevBtn) { prevBtn.disabled = (currentPage === 0); }
-        if (nextBtn) { nextBtn.disabled = (currentPage >= totalPages - 1); }
+    /* ── Load via fetch (works with HTTP server) ───────── */
+    async function loadViaFetch(url, onProgress) {
+      var res = await fetch(url);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var contentLen = +(res.headers.get('Content-Length') || 0);
+      var reader = res.body.getReader();
+      var chunks = [], received = 0;
+      while (true) {
+        var r = await reader.read();
+        if (r.done) break;
+        chunks.push(r.value);
+        received += r.value.length;
+        if (onProgress && contentLen) onProgress(received / contentLen);
       }
+      return await JSZip.loadAsync(new Blob(chunks));
+    }
 
-      /* Category buttons */
-      document.querySelectorAll('#ic-category-buttons .ic-cat-btn').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          document.querySelectorAll('#ic-category-buttons .ic-cat-btn').forEach(function (b) {
-            b.classList.remove('is-active');
-          });
-          btn.classList.add('is-active');
-          currentCat  = btn.dataset.cat;
-          currentPage = 0;
-          render();
-        });
+    /* ── Load via <script> tag (works with file://) ────── */
+    function loadViaScript(id) {
+      return new Promise(function(resolve, reject) {
+        var varName = '__NPZ_' + id;
+        var script = document.createElement('script');
+        script.src = 'resources/comparison/meshmimic/' + id + '.js';
+        script.onload = function() {
+          var b64 = window[varName];
+          delete window[varName];
+          script.remove();
+          if (!b64) { reject(new Error('Data variable not found in js file')); return; }
+          var bin = atob(b64);
+          b64 = null;
+          var buf = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+          bin = null;
+          JSZip.loadAsync(buf.buffer).then(resolve).catch(reject);
+        };
+        script.onerror = function() {
+          script.remove();
+          reject(new Error(
+            'Cannot load scene data.\n' +
+            'Run: python resources/comparison/convert_for_web.py'
+          ));
+        };
+        document.head.appendChild(script);
       });
+    }
 
-      /* Pagination arrows */
-      var prevBtn = document.getElementById('ic-prev');
-      var nextBtn = document.getElementById('ic-next');
-      if (prevBtn) {
-        prevBtn.addEventListener('click', function () { currentPage--; render(); });
+    /* ── Unified loader: fetch first, script-tag fallback ─ */
+    async function loadScene(id, onProgress) {
+      var zip;
+      try {
+        zip = await loadViaFetch(npzUrl(id), onProgress);
+      } catch(e) {
+        if (onProgress) onProgress(-1);
+        zip = await loadViaScript(id);
       }
-      if (nextBtn) {
-        nextBtn.addEventListener('click', function () { currentPage++; render(); });
+      return await parseZipToArrays(zip);
+    }
+
+    /* ── Three.js mesh viewer ──────────────────────────────── */
+    class MeshViewer {
+      constructor(container) {
+        this.container = container;
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer.setClearColor(0x1e1e2e);
+        container.appendChild(this.renderer.domElement);
+
+        this.scene3 = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.01, 500);
+
+        this.scene3.add(new THREE.AmbientLight(0xffffff, 0.55));
+        var d1 = new THREE.DirectionalLight(0xffffff, 0.75);
+        d1.position.set(5, 10, 7);
+        this.scene3.add(d1);
+        var d2 = new THREE.DirectionalLight(0xffffff, 0.35);
+        d2.position.set(-5, 5, -5);
+        this.scene3.add(d2);
+
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enableDamping = true;
+        this.controls.dampingFactor = 0.12;
+
+        this.sceneMesh = null;
+        this.humanMesh = null;
+        this.humanVerts = null;
+        this.numFrames = 0;
+        this.numVerts = 0;
+        this.frame = 0;
+        this._raf = null;
+
+        this._animate = this._animate.bind(this);
+        this._onResize = this._onResize.bind(this);
+        window.addEventListener('resize', this._onResize);
+        this._animate();
       }
 
-      render();
+      load(arrays) {
+        this._clear();
+
+        var sv = arrays.scene_vertices.data;
+        var sf = arrays.scene_faces.data;
+        var hv = arrays.human_vertices.data;
+        var hf = arrays.human_faces.data;
+        var hvShape = arrays.human_vertices.shape;
+
+        this.numFrames = hvShape[0];
+        this.numVerts = hvShape[1];
+        this.humanVerts = hv;
+
+        var sg = new THREE.BufferGeometry();
+        sg.setAttribute('position', new THREE.Float32BufferAttribute(sv, 3));
+        var sfU = new Uint32Array(sf.length);
+        for (var i = 0; i < sf.length; i++) sfU[i] = sf[i] < 0 ? 0 : sf[i];
+        sg.setIndex(new THREE.BufferAttribute(sfU, 1));
+        sg.computeVertexNormals();
+        this.sceneMesh = new THREE.Mesh(sg, new THREE.MeshPhongMaterial({
+          color: 0xe6e6d2, side: THREE.DoubleSide
+        }));
+        this.scene3.add(this.sceneMesh);
+
+        var hg = new THREE.BufferGeometry();
+        var posArr = new Float32Array(this.numVerts * 3);
+        posArr.set(hv.subarray(0, this.numVerts * 3));
+        hg.setAttribute('position', new THREE.Float32BufferAttribute(posArr, 3));
+        var hfU = new Uint32Array(hf.length);
+        for (var i = 0; i < hf.length; i++) hfU[i] = hf[i] < 0 ? 0 : hf[i];
+        hg.setIndex(new THREE.BufferAttribute(hfU, 1));
+        hg.computeVertexNormals();
+        this.humanMesh = new THREE.Mesh(hg, new THREE.MeshPhongMaterial({
+          color: 0x00bfff, side: THREE.DoubleSide
+        }));
+        this.scene3.add(this.humanMesh);
+
+        this.frame = 0;
+        this._fitCamera();
+      }
+
+      setFrame(idx) {
+        if (!this.humanMesh || idx < 0 || idx >= this.numFrames) return;
+        this.frame = idx;
+        var off = idx * this.numVerts * 3;
+        var pos = this.humanMesh.geometry.attributes.position.array;
+        var src = this.humanVerts;
+        var n = this.numVerts * 3;
+        for (var i = 0; i < n; i++) pos[i] = src[off + i];
+        this.humanMesh.geometry.attributes.position.needsUpdate = true;
+        this.humanMesh.geometry.computeVertexNormals();
+      }
+
+      _fitCamera() {
+        var box = new THREE.Box3();
+        if (this.sceneMesh) box.expandByObject(this.sceneMesh);
+        if (this.humanMesh) box.expandByObject(this.humanMesh);
+        var center = new THREE.Vector3();
+        box.getCenter(center);
+        var size = new THREE.Vector3();
+        box.getSize(size);
+        var maxDim = Math.max(size.x, size.y, size.z);
+
+        this.camera.position.set(center.x + maxDim * 0.9, center.y + maxDim * 0.6, center.z + maxDim * 0.9);
+        this.camera.near = maxDim * 0.001;
+        this.camera.far = maxDim * 20;
+        this.camera.updateProjectionMatrix();
+        this.controls.target.copy(center);
+        this.controls.update();
+      }
+
+      _clear() {
+        var self = this;
+        [this.sceneMesh, this.humanMesh].forEach(function(m) {
+          if (!m) return;
+          self.scene3.remove(m);
+          m.geometry.dispose();
+          m.material.dispose();
+        });
+        this.sceneMesh = null;
+        this.humanMesh = null;
+        this.humanVerts = null;
+      }
+
+      _animate() {
+        this._raf = requestAnimationFrame(this._animate);
+        this.controls.update();
+        this.renderer.render(this.scene3, this.camera);
+      }
+
+      _onResize() {
+        var w = this.container.clientWidth;
+        var h = this.container.clientHeight;
+        this.renderer.setSize(w, h);
+        this.camera.aspect = w / h;
+        this.camera.updateProjectionMatrix();
+      }
+
+      dispose() {
+        window.removeEventListener('resize', this._onResize);
+        if (this._raf) cancelAnimationFrame(this._raf);
+        this._clear();
+        this.controls.dispose();
+        this.renderer.dispose();
+        if (this.renderer.domElement.parentNode)
+          this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);
+      }
+    }
+
+    /* ── UI wiring ─────────────────────────────────────────── */
+    var btnBox      = document.getElementById('ic-scene-buttons');
+    var viewerDiv   = document.getElementById('ic-viewer');
+    var overlay     = document.getElementById('ic-viewer-overlay');
+    var overlayText = document.getElementById('ic-overlay-text');
+    var spinner     = document.getElementById('ic-spinner');
+    var controlsBar = document.getElementById('ic-controls-bar');
+    var timeline    = document.getElementById('ic-timeline');
+    var frameInfo   = document.getElementById('ic-frame-info');
+    var speedSlider = document.getElementById('ic-speed');
+    var speedLabel  = document.getElementById('ic-speed-label');
+    var btnPrev     = document.getElementById('ic-btn-prev');
+    var btnPlay     = document.getElementById('ic-btn-play');
+    var btnNext     = document.getElementById('ic-btn-next');
+
+    var viewer = null;
+    var playing = false;
+    var lastTick = 0;
+    var currentId = null;
+    var activeBtn = null;
+
+    SCENES.forEach(function(s) {
+      var btn = document.createElement('button');
+      btn.className = 'ic-scene-btn';
+      btn.textContent = s.label;
+      btn.addEventListener('click', function() { selectScene(s.id, btn); });
+      btnBox.appendChild(btn);
+    });
+
+    async function selectScene(id, btn) {
+      if (currentId === id) return;
+      currentId = id;
+      playing = false;
+      btnPlay.innerHTML = '&#9654;';
+
+      if (activeBtn) activeBtn.classList.remove('is-active');
+      btn.classList.add('is-active');
+      activeBtn = btn;
+
+      overlay.style.opacity = '1';
+      overlay.style.pointerEvents = 'auto';
+      spinner.style.display = 'block';
+      overlayText.textContent = 'Loading scene\u2026';
+
+      try {
+        var arrays = await loadScene(id, function(pct) {
+          if (pct < 0) { overlayText.textContent = 'Loading scene\u2026'; return; }
+          overlayText.textContent = 'Loading\u2026 ' + Math.round(pct * 100) + '%';
+        });
+
+        overlayText.textContent = 'Building meshes\u2026';
+        await new Promise(function(r){ requestAnimationFrame(r); });
+
+        if (!viewer) viewer = new MeshViewer(viewerDiv);
+        viewer.load(arrays);
+
+        var nf = viewer.numFrames;
+        timeline.max = Math.max(0, nf - 1);
+        timeline.value = 0;
+        frameInfo.textContent = '1 / ' + nf;
+        controlsBar.style.display = 'block';
+
+        overlay.style.opacity = '0';
+        overlay.style.pointerEvents = 'none';
+      } catch(err) {
+        console.error(err);
+        spinner.style.display = 'none';
+        var msg = err.message || String(err);
+        if (location.protocol === 'file:' && msg.indexOf('Cannot load') >= 0) {
+          overlayText.innerHTML = 'Missing .js data files.<br>' +
+            '<span style="font-size:0.88rem;opacity:0.8;">Run once:<br>' +
+            '<code style="background:rgba(255,255,255,0.12);padding:2px 8px;border-radius:4px;">python resources/comparison/convert_for_web.py</code></span>';
+        } else {
+          overlayText.textContent = 'Error: ' + msg;
+        }
+      }
+    }
+
+    function syncUI() {
+      if (!viewer) return;
+      timeline.value = viewer.frame;
+      frameInfo.textContent = (viewer.frame + 1) + ' / ' + viewer.numFrames;
+    }
+
+    btnPlay.addEventListener('click', function() {
+      playing = !playing;
+      btnPlay.innerHTML = playing ? '&#9208;' : '&#9654;';
+      if (playing) lastTick = performance.now();
+    });
+
+    btnPrev.addEventListener('click', function() {
+      if (!viewer) return;
+      viewer.setFrame((viewer.frame - 1 + viewer.numFrames) % viewer.numFrames);
+      syncUI();
+    });
+
+    btnNext.addEventListener('click', function() {
+      if (!viewer) return;
+      viewer.setFrame((viewer.frame + 1) % viewer.numFrames);
+      syncUI();
+    });
+
+    timeline.addEventListener('input', function() {
+      if (!viewer) return;
+      viewer.setFrame(parseInt(timeline.value));
+      syncUI();
+    });
+
+    speedSlider.addEventListener('input', function() {
+      speedLabel.textContent = speedSlider.value + ' FPS';
+    });
+
+    (function tick() {
+      requestAnimationFrame(tick);
+      if (!playing || !viewer) return;
+      var now = performance.now();
+      var fps = parseInt(speedSlider.value);
+      if (now - lastTick < 1000 / fps) return;
+      lastTick = now;
+      viewer.setFrame((viewer.frame + 1) % viewer.numFrames);
+      syncUI();
     })();
   </script>
 </body>
