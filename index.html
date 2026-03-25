@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html class="fontawesome-i2svg-active fontawesome-i2svg-complete">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="description" content="MeshMimic: Geometry-Aware Humanoid Motion Learning through 3D Scene Reconstruction">
+  <meta name="keywords" content="Humanoid Robots; Reinforcement Learning; Motion Learning; 3D Scene Reconstruction">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MeshMimic</title>
+
+  <style type="text/css">svg:not(:root).svg-inline--fa{overflow:visible}.svg-inline--fa{display:inline-block;font-size:inherit;height:1em;overflow:visible;vertical-align:-.125em}.svg-inline--fa.fa-lg{vertical-align:-.225em}.svg-inline--fa.fa-w-1{width:.0625em}.svg-inline--fa.fa-w-2{width:.125em}.svg-inline--fa.fa-w-3{width:.1875em}.svg-inline--fa.fa-w-4{width:.25em}.svg-inline--fa.fa-w-5{width:.3125em}.svg-inline--fa.fa-w-6{width:.375em}.svg-inline--fa.fa-w-7{width:.4375em}.svg-inline--fa.fa-w-8{width:.5em}.svg-inline--fa.fa-w-9{width:.5625em}.svg-inline--fa.fa-w-10{width:.625em}.svg-inline--fa.fa-w-11{width:.6875em}.svg-inline--fa.fa-w-12{width:.75em}.svg-inline--fa.fa-w-13{width:.8125em}.svg-inline--fa.fa-w-14{width:.875em}.svg-inline--fa.fa-w-15{width:.9375em}.svg-inline--fa.fa-w-16{width:1em}.svg-inline--fa.fa-w-17{width:1.0625em}.svg-inline--fa.fa-w-18{width:1.125em}.svg-inline--fa.fa-w-19{width:1.1875em}.svg-inline--fa.fa-w-20{width:1.25em}.svg-inline--fa.fa-pull-left{margin-right:.3em;width:auto}.svg-inline--fa.fa-pull-right{margin-left:.3em;width:auto}.svg-inline--fa.fa-border{height:1.5em}.svg-inline--fa.fa-li{width:2em}.svg-inline--fa.fa-fw{width:1.25em}.fa-layers svg.svg-inline--fa{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.fa-layers{display:inline-block;height:1em;position:relative;text-align:center;vertical-align:-.125em;width:1em}.fa-layers svg.svg-inline--fa{-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter,.fa-layers-text{display:inline-block;position:absolute;text-align:center}.fa-layers-text{left:50%;top:50%;-webkit-transform:translate(-50%,-50%);transform:translate(-50%,-50%);-webkit-transform-origin:center center;transform-origin:center center}.fa-layers-counter{background-color:#ff253a;border-radius:1em;-webkit-box-sizing:border-box;box-sizing:border-box;color:#fff;height:1.5em;line-height:1;max-width:5em;min-width:1.5em;overflow:hidden;padding:.25em;right:0;text-overflow:ellipsis;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-bottom-right{bottom:0;right:0;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom right;transform-origin:bottom right}.fa-layers-bottom-left{bottom:0;left:0;right:auto;top:auto;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:bottom left;transform-origin:bottom left}.fa-layers-top-right{right:0;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top right;transform-origin:top right}.fa-layers-top-left{left:0;right:auto;top:0;-webkit-transform:scale(.25);transform:scale(.25);-webkit-transform-origin:top left;transform-origin:top left}.fa-lg{font-size:1.3333333333em;line-height:.75em;vertical-align:-.0667em}.fa-xs{font-size:.75em}.fa-sm{font-size:.875em}.fa-1x{font-size:1em}.fa-2x{font-size:2em}.fa-3x{font-size:3em}.fa-4x{font-size:4em}.fa-5x{font-size:5em}.fa-6x{font-size:6em}.fa-7x{font-size:7em}.fa-8x{font-size:8em}.fa-9x{font-size:9em}.fa-10x{font-size:10em}.fa-fw{text-align:center;width:1.25em}.fa-ul{list-style-type:none;margin-left:2.5em;padding-left:0}.fa-ul>li{position:relative}.fa-li{left:-2em;position:absolute;text-align:center;width:2em;line-height:inherit}.fa-border{border:solid .08em #eee;border-radius:.1em;padding:.2em .25em .15em}.fa-pull-left{float:left}.fa-pull-right{float:right}.fa.fa-pull-left,.fab.fa-pull-left,.fal.fa-pull-left,.far.fa-pull-left,.fas.fa-pull-left{margin-right:.3em}.fa.fa-pull-right,.fab.fa-pull-right,.fal.fa-pull-right,.far.fa-pull-right,.fas.fa-pull-right{margin-left:.3em}.fa-spin{-webkit-animation:fa-spin 2s infinite linear;animation:fa-spin 2s infinite linear}.fa-pulse{-webkit-animation:fa-spin 1s infinite steps(8);animation:fa-spin 1s infinite steps(8)}@-webkit-keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}@keyframes fa-spin{0%{-webkit-transform:rotate(0);transform:rotate(0)}100%{-webkit-transform:rotate(360deg);transform:rotate(360deg)}}.fa-rotate-90{-webkit-transform:rotate(90deg);transform:rotate(90deg)}.fa-rotate-180{-webkit-transform:rotate(180deg);transform:rotate(180deg)}.fa-rotate-270{-webkit-transform:rotate(270deg);transform:rotate(270deg)}.fa-flip-horizontal{-webkit-transform:scale(-1,1);transform:scale(-1,1)}.fa-flip-vertical{-webkit-transform:scale(1,-1);transform:scale(1,-1)}.fa-flip-both,.fa-flip-horizontal.fa-flip-vertical{-webkit-transform:scale(-1,-1);transform:scale(-1,-1)}:root .fa-flip-both,:root .fa-flip-horizontal,:root .fa-flip-vertical,:root .fa-rotate-180,:root .fa-rotate-270,:root .fa-rotate-90{-webkit-filter:none;filter:none}.fa-stack{display:inline-block;height:2em;position:relative;width:2.5em}.fa-stack-1x,.fa-stack-2x{bottom:0;left:0;margin:auto;position:absolute;right:0;top:0}.svg-inline--fa.fa-stack-1x{height:1em;width:1.25em}.svg-inline--fa.fa-stack-2x{height:2em;width:2.5em}.fa-inverse{color:#fff}.sr-only{border:0;clip:rect(0,0,0,0);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px}.sr-only-focusable:active,.sr-only-focusable:focus{clip:auto;height:auto;margin:0;overflow:visible;position:static;width:auto}.svg-inline--fa .fa-primary{fill:var(--fa-primary-color,currentColor);opacity:1;opacity:var(--fa-primary-opacity,1)}.svg-inline--fa .fa-secondary{fill:var(--fa-secondary-color,currentColor);opacity:.4;opacity:var(--fa-secondary-opacity,.4)}.svg-inline--fa.fa-swap-opacity .fa-primary{opacity:.4;opacity:var(--fa-secondary-opacity,.4)}.svg-inline--fa.fa-swap-opacity .fa-secondary{opacity:1;opacity:var(--fa-primary-opacity,1)}.svg-inline--fa mask .fa-primary,.svg-inline--fa mask .fa-secondary{fill:#000}.fad.fa-inverse{color:#fff}</style>
+  <link rel="stylesheet" href="./template/bulma.min.css">
+  <link rel="stylesheet" href="./template/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./template/bulma-slider.min.css">
+  <link rel="stylesheet" href="./template/fontawesome.all.min.css">
+  <link rel="stylesheet" href="./template/academicons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="./template/index.css">
+
+  <script src="./template/jquery.min.js.下载"></script>
+  <script defer src="./template/fontawesome.all.min.js.下载"></script>
+  <script src="./template/bulma-carousel.min.js.下载"></script>
+  <script src="./template/bulma-slider.min.js.下载"></script>
+  <script src="./template/index.js.下载"></script>
+
+  <link rel="icon" href="resources/icon.png">
+
+  <style>
+    .video-frame,
+    .video-container {
+      border: 0 !important;
+      border-radius: 12px !important;
+      background: transparent !important;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18) !important;
+      overflow: hidden;
+      padding: 0 !important;
+      height: auto !important;
+      aspect-ratio: 16 / 9;
+    }
+
+    video {
+      border: 0 !important;
+      border-radius: 12px !important;
+      box-shadow: none !important;
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+    }
+
+    .publication-authors {
+      font-size: 1.05rem;
+    }
+
+    .publication-authors .author-block a {
+      font-size: 1.05rem;
+    }
+
+    .publication-links .button {
+      font-size: 1rem;
+      padding-left: 1.2rem;
+      padding-right: 1.2rem;
+    }
+
+    .publication-links .button .icon {
+      font-size: 1.1rem;
+    }
+
+    .brand-accent {
+      color: #f59e0b;
+    }
+
+    .project-title-inline {
+      font-size: 3.6rem;
+      font-weight: 700;
+      color: #2f2f2f;
+      line-height: 1.35;
+    }
+
+    body {
+      background: #f2f2f2;
+      color: #1f2937;
+      font-family: "Source Sans 3", "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+    }
+
+    .band {
+      padding-top: 3.5rem;
+      padding-bottom: 3.5rem;
+    }
+
+    .band-a {
+      background: #f6f6f3;
+    }
+
+    .band-b {
+      background: #efefea;
+    }
+
+    .band-c {
+      background: #f7f7f2;
+    }
+
+    .band-d {
+      background: #ecece6;
+    }
+
+    .band-white {
+      background: #ffffff;
+    }
+
+    .container {
+      max-width: 1100px;
+    }
+
+    .title {
+      color: #1f2937;
+    }
+
+    .content,
+    .publication-authors,
+    .publication-links,
+    .r2s2r-caption,
+    .r2s2r-title {
+      color: #4b5563;
+    }
+
+    .author-abstract {
+      margin-top: 1.25rem;
+    }
+
+    .r2s2r-carousel {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .r2s2r-stage {
+      display: grid;
+      gap: 1.75rem;
+    }
+
+    .r2s2r-row {
+      display: flex;
+      justify-content: center;
+    }
+
+    .r2s2r-item {
+      width: 100%;
+      max-width: 820px;
+      text-align: center;
+    }
+
+    .r2s2r-item .video-frame {
+      height: 320px !important;
+      aspect-ratio: auto !important;
+      padding: 0 !important;
+    }
+
+    .r2s2r-item video {
+      object-fit: contain !important;
+      background: transparent;
+    }
+
+    .r2s2r-nav {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      color: #111827;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+    }
+
+    .r2s2r-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    @media (max-width: 768px) {
+      .r2s2r-carousel {
+        grid-template-columns: 1fr;
+      }
+
+      .r2s2r-nav {
+        justify-self: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <section class="hero is-link is-fullheight video" style="overflow: hidden; position:relative;">
+    <div class="hero-video" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 101%; height: 101%;">
+      <video id="hero-video" playsinline autoplay muted style="width: 100%; height: 100%; object-fit: cover; object-position: left top;">
+        <source src="resources/meshmimic_videos/real2sim2real_videos/climb_box7.mp4" type="video/mp4">
+      </video>
+    </div>
+
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <h1 class="title is-1 publication-title is-size-1-mobile" style="font-size: 6.6rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
+          <span class="brand-accent">MeshMimic</span>
+        </h1>
+        <h1 class="subtitle is-1 publication-title is-size-4-mobile" style="font-size: 3.6rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
+          Geometry-Aware Humanoid Motion Learning through 3D Scene Reconstruction
+        </h1>
+      </div>
+    </div>
+  </section>
+
+  <section class="hero band band-white">
+    <div class="hero-body">
+      <div class="container is-fullhd">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <div class="project-title-inline" style="margin-bottom: 1.2rem;">
+              <span class="brand-accent">MeshMimic</span>: Geometry-Aware Humanoid Motion Learning through 3D Scene Reconstruction
+            </div>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block"><a href="https://github.com/jonyzhang2023">Qiang Zhang</a><sup>1,2,*</sup>,</span>
+              <span class="author-block"><a href="https://jiahao-ma.github.io/">Jiahao Ma</a><sup>1,7,*</sup>,</span>
+              <span class="author-block"><a href="https://githubleoliu.github.io/peiranliu.github.io/">Peiran Liu</a><sup>1,2,*</sup>,</span>
+              <span class="author-block"><a href="https://github.com/shuaishi1991">Shuai Shi</a><sup>1,*</sup>,</span>
+              <span class="author-block"><a href="https://github.com/zzerann">Zeran Su</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://zifanw.notion.site/">Zifan Wang</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://scholar.google.com/citations?user=tFi_8e4AAAAJ&hl=zh-CN">Jingkai Sun</a><sup>1,3</sup>,</span>
+              <span class="author-block"><a href="https://openreview.net/profile?id=~Wei_Cui8">Wei Cui</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://github.com/JiaLinYu9">Jialin Yu</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://github.com/HanGoneGitHub">Gang Han</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://github.com/z648848">Wen Zhao</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://github.com/sunpihai-up">Pihai Sun</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://yinkangning0124.github.io/">Kangning Yin</a><sup>6</sup>,</span>
+              <span class="author-block"><a href="https://openreview.net/profile?id=~Jiaxu_Wang1">Jiaxu Wang</a><sup>5</sup>,</span>
+              <span class="author-block"><a href="https://sagecao1125.github.io">Jiahang Cao</a><sup>3</sup>,</span>
+              <span class="author-block"><a href="https://openreview.net/profile?id=~Lingfeng_Zhang3">Lingfeng Zhang</a><sup>4</sup>,</span>
+              <span class="author-block"><a href="https://chaducheng.github.io/">Hao Cheng</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="#">Xiaoshuai Hao</a><sup>4</sup>,</span>
+              <span class="author-block"><a href="https://personal.hkust-gz.edu.cn/jiyiding/">Yiding Ji</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://openreview.net/profile?id=~Junwei_Liang1">Junwei Liang</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://ecs.syr.edu/faculty/tang/">Jian Tang</a><sup>1</sup>,</span>
+              <span class="author-block"><a href="https://facultyprofiles.hkust-gz.edu.cn/faculty-personal-page/XU-Renjing/renjingxu">Renjing Xu</a><sup>2</sup>,</span>
+              <span class="author-block"><a href="https://openreview.net/profile?id=~Yijie_Guo3">Yijie Guo</a><sup>1</sup></span>
+            </div>
+
+            <div class="is-size-6 publication-authors" style="margin-top: 10px;">
+              <span class="author-block"><sup>1</sup>X-Humanoid,</span>
+              <span class="author-block"><sup>2</sup>HKUST(GZ),</span>
+              <span class="author-block"><sup>3</sup>HKU,</span>
+              <span class="author-block"><sup>4</sup>Tsinghua,</span>
+              <span class="author-block"><sup>5</sup>CUHK,</span>
+              <span class="author-block"><sup>6</sup>SJTU,</span>
+              <span class="author-block"><sup>7</sup>ANU</span>
+            </div>
+
+            <div class="is-size-6" style="margin-top: 0.5rem; font-style: italic;">
+              * Equal Contribution. Corresponding Author.
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <span class="link-block">
+                  <a href="https://arxiv.org/pdf/2602.15733" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                    <span>Paper</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/2602.15733" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                    <span class="icon"><i class="ai ai-arxiv"></i></span>
+                    <span>arXiv</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>Code (Coming Soon)</span>
+                  </a>
+                </span>
+                <span class="link-block">
+                  <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                    <span class="icon"><i class="fas fa-database"></i></span>
+                    <span>Data and Model (Coming Soon)</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+            <div class="has-text-centered" style="margin-top: 3.8rem;">
+              <img src="resources/figures/cover.jpeg" alt="MeshMimic pipeline" style="width: 68%; height: auto; border-radius: 12px; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);">
+            </div>
+            <p class="content" style="font-size: 1rem; color: #4b5563; max-width: 860px; margin: 0.9rem auto 0; line-height: 1.7; text-align: center;">
+              <b><i>MeshMimic</i></b>. In-the-wild monocular videos yield long-horizon motions over <b>complex terrains</b><br>
+              for contact-consistent motion–terrain interaction learning.
+            </p>
+            <div class="columns is-centered has-text-centered author-abstract">
+              <div class="column is-two-thirds">
+                <h2 class="title is-3">Abstract</h2>
+                <div class="content has-text-justified">
+                  <p>
+                    Humanoid motion control has witnessed significant breakthroughs in recent years, with deep reinforcement learning (RL) emerging as a primary catalyst for achieving complex, human-like behaviors. However, the high dimensionality and intricate dynamics of humanoid robots make manual motion design impractical, leading to a heavy reliance on expensive motion capture (MoCap) data. These datasets are not only costly to acquire but also frequently lack the necessary geometric context of the surrounding physical environment. Consequently, existing motion synthesis frameworks often suffer from a decoupling of motion and scene, resulting in physical inconsistencies such as contact slippage or mesh penetration during terrain-aware tasks.
+                    In this work, we present <b><i>MeshMimic</i></b>, an innovative framework that bridges 3D scene reconstruction and embodied intelligence to enable humanoid robots to learn coupled motion-terrain interactions directly from video. By leveraging state-of-the-art 3D vision models, our framework precisely segments and reconstructs both human trajectories and the underlying 3D geometry of terrains and objects. We introduce an optimization algorithm based on kinematic consistency to extract high-quality motion data from noisy visual reconstructions, alongside a contact-invariant retargeting method that transfers human-environment interaction features to the humanoid agent. Experimental results demonstrate that MeshMimic achieves robust, highly dynamic performance across diverse and challenging terrains. Our approach proves that a low-cost pipeline utilizing only consumer-grade monocular sensors can facilitate the training of complex physical interactions, enabling scalable learning in unstructured environments.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band band-a">
+    <div class="container">
+      <h2 class="title is-2" style="text-align: center;">Real-Sim-Real Results</h2>
+      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 0; line-height: 1.7; text-align: justify;">
+        Each result has three parts: <strong>Left</strong> is captured with a consumer monocular RGB camera <strong> without MOCAP</strong> assistance; <strong>Middle</strong> is the reconstructed scene with human SMPLX; and <strong>Right</strong> is the deployed result. Most videos show contact-rich interactions with the environment.
+      </p>
+
+      <div class="r2s2r-carousel" id="r2s2r-carousel">
+        <button class="r2s2r-nav" type="button" aria-label="Previous" id="r2s2r-prev">
+          <svg viewBox="0 0 50 80" width="18" height="18" aria-hidden="true" focusable="false">
+            <polyline fill="currentColor" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="45.63,75.8 0.375,38.087 45.63,0.375"></polyline>
+          </svg>
+        </button>
+        <div class="r2s2r-stage">
+          <div class="r2s2r-row">
+            <div class="r2s2r-item" data-slot="0">
+              <div class="video-frame" style="height: 350px; display: flex; align-items: center; justify-content: center;">
+                <video controls autoplay loop muted playsinline poster="resources/loading-icon.gif" style="max-height: 100%; max-width: 100%; object-fit: contain;"></video>
+              </div>
+              <p class="r2s2r-title" style="margin-top: 0.5rem; font-size: 0.95rem; color: #4a4a4a;"></p>
+              <p class="r2s2r-caption" style="font-size: 0.9rem; color: #666; font-style: italic; line-height: 1.5;"></p>
+            </div>
+          </div>
+          <div class="r2s2r-row">
+            <div class="r2s2r-item" data-slot="1">
+              <div class="video-frame" style="height: 350px; display: flex; align-items: center; justify-content: center;">
+                <video controls autoplay loop muted playsinline poster="resources/loading-icon.gif" style="max-height: 100%; max-width: 100%; object-fit: contain;"></video>
+              </div>
+              <p class="r2s2r-title" style="margin-top: 0.5rem; font-size: 0.95rem; color: #4a4a4a;"></p>
+              <p class="r2s2r-caption" style="font-size: 0.9rem; color: #666; font-style: italic; line-height: 1.5;"></p>
+            </div>
+          </div>
+        </div>
+        <button class="r2s2r-nav" type="button" aria-label="Next" id="r2s2r-next">
+          <svg viewBox="0 0 50 80" width="18" height="18" aria-hidden="true" focusable="false">
+            <polyline fill="currentColor" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="0.375,0.375 45.63,38.087 0.375,75.8"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band band-a">
+    <div class="container">
+      <h2 class="title is-2" style="text-align: center;">Real-Sim Results</h2>
+      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 0; line-height: 1.7; text-align: justify;">
+        These real-sim results are reconstructed from in-the-wild monocular videos, with the original video on the left and the reconstruction on the right. Most examples involve <strong>long-horizon, contact-rich interactions</strong> in challenging real-world environments.
+      </p>
+
+      <div class="r2s2r-carousel" id="r2s-carousel">
+        <button class="r2s2r-nav" type="button" aria-label="Previous" id="r2s-prev">
+          <svg viewBox="0 0 50 80" width="18" height="18" aria-hidden="true" focusable="false">
+            <polyline fill="currentColor" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="45.63,75.8 0.375,38.087 45.63,0.375"></polyline>
+          </svg>
+        </button>
+        <div class="r2s2r-stage">
+          <div class="r2s2r-row">
+            <div class="r2s2r-item" data-slot="0">
+              <div class="video-frame" style="height: 350px; display: flex; align-items: center; justify-content: center;">
+                <video controls autoplay loop muted playsinline poster="resources/loading-icon.gif" style="max-height: 100%; max-width: 100%; object-fit: contain;"></video>
+              </div>
+              <p class="r2s2r-title" style="margin-top: 0.5rem; font-size: 0.95rem; color: #4a4a4a;"></p>
+              <p class="r2s2r-caption" style="font-size: 0.9rem; color: #666; font-style: italic; line-height: 1.5;"></p>
+            </div>
+          </div>
+          <div class="r2s2r-row">
+            <div class="r2s2r-item" data-slot="1">
+              <div class="video-frame" style="height: 350px; display: flex; align-items: center; justify-content: center;">
+                <video controls autoplay loop muted playsinline poster="resources/loading-icon.gif" style="max-height: 100%; max-width: 100%; object-fit: contain;"></video>
+              </div>
+              <p class="r2s2r-title" style="margin-top: 0.5rem; font-size: 0.95rem; color: #4a4a4a;"></p>
+              <p class="r2s2r-caption" style="font-size: 0.9rem; color: #666; font-style: italic; line-height: 1.5;"></p>
+            </div>
+          </div>
+        </div>
+        <button class="r2s2r-nav" type="button" aria-label="Next" id="r2s-next">
+          <svg viewBox="0 0 50 80" width="18" height="18" aria-hidden="true" focusable="false">
+            <polyline fill="currentColor" stroke-width=".5em" stroke-linecap="round" stroke-linejoin="round" points="0.375,0.375 45.63,38.087 0.375,75.8"></polyline>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band band-white" id="BibTeX">
+    <div class="container content">
+      <h2 class="titile">BibTeX</h2>
+      <pre><code>@misc{zhang2026meshmimic,
+  title         = {MeshMimic: Geometry-Aware Humanoid Motion Learning through 3D Scene Reconstruction},
+  author        = {Zhang, Qiang and Ma, Jiahao and Liu, Peiran and Shi, Shuai and Su, Zeran and Wang, Zifan and Sun, Jingkai and Cui, Wei and Yu, Jialin and Han, Gang and Zhao, Wen and Sun, Pihai and Yin, Kangning and Wang, Jiaxu and Cao, Jiahang and Zhang, Lingfeng and Cheng, Hao and Hao, Xiaoshuai and Ji, Yiding and Liang, Junwei and Tang, Jian and Xu, Renjing and Guo, Yijie},
+  year          = {2026},
+  eprint        = {2602.15733},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2602.15733}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <p>Page template borrowed from <a href="https://nerfies.github.io/"><span class="dnerf">Nerfies</span></a> and <a href="https://humanoid4parkour.github.io/"><span class="dnerf">Humanoid Parkour Learning</span></a>.</p>
+      </div>
+    </div>
+  </footer>
+  <script>
+    (function () {
+      var heroVideo = document.getElementById("hero-video");
+      if (!heroVideo) {
+        return;
+      }
+
+      var playlist = [
+        "resources/meshmimic_videos/real2sim2real_videos/climb_box7.mp4",
+        "resources/meshmimic_videos/real2sim2real_videos/climb_box8.mp4",
+        "resources/meshmimic_videos/real2sim2real_videos/jump_box9.mp4",
+        "resources/meshmimic_videos/real2sim2real_videos/odin_jcv3.mp4",
+        "resources/meshmimic_videos/real2sim2real_videos/safety_vault10.mp4"
+      ];
+
+      var currentIndex = 0;
+
+      function loadVideo(index) {
+        heroVideo.pause();
+        heroVideo.setAttribute("src", playlist[index]);
+        heroVideo.load();
+        heroVideo.play().catch(function () {
+          // Autoplay might be blocked on some browsers.
+        });
+      }
+
+      heroVideo.addEventListener("ended", function () {
+        currentIndex = (currentIndex + 1) % playlist.length;
+        loadVideo(currentIndex);
+      });
+
+      heroVideo.addEventListener("error", function () {
+        currentIndex = (currentIndex + 1) % playlist.length;
+        loadVideo(currentIndex);
+      });
+
+      heroVideo.removeAttribute("loop");
+      loadVideo(currentIndex);
+    })();
+  </script>
+  <script>
+    (function () {
+      var items = [
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/jump_box9_real2sim2real.mp4",
+          title: "Jump Box2 (JB2)",
+          caption: "Jump Box2 (JB2): running single-leg jump onto a 40 cm box and drop down."
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/odin_jcv3_real2sim2real.mp4",
+          title: "Jump Climb Down1 (JCD1)",
+          caption: "Jump Climb Down1 (JCD1): jump onto a 20 cm box, climb onto a 60 cm box, and descend using single-hand support."
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/climb_box7_real2sim2real.mp4",
+          title: "Jump Box1 (JB1)",
+          caption: "Jump Box1 (JB1): jump onto a 40 cm box."
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/climb_box8_real2sim2real.mp4",
+          title: "Climb Box2 (CB2)",
+          caption: "Climb Box2 (CB2): side climb onto a 60 cm box."
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/safety_vault10_real2sim2real.mp4",
+          title: "Safety Vault2 (SV2)",
+          caption: "Safety Vault2 (SV2): double-hand safety vault over a 40 cm box."
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/climb_box3_real2sim2real.mp4",
+          title: "Climb Box1 (CB1)",
+          caption: "Climb Box1 (CB1): climb onto a 50 cm box, walk to edge, and descend using single-hand support."
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim2real_videos3/jump_box6_real2sim2real.mp4",
+          title: "Jump Box3 (JB3)",
+          caption: "Jump Box3 (JB3): jump onto a 40 cm box with both feet, then walk to the edge of box, and finally jump down."
+        }
+      ];
+
+      var prevButton = document.getElementById("r2s2r-prev");
+      var nextButton = document.getElementById("r2s2r-next");
+      var slots = document.querySelectorAll(".r2s2r-item");
+      if (!prevButton || !nextButton || slots.length === 0) {
+        return;
+      }
+
+      var slideSize = 2;
+      var slideIndex = 0;
+      var maxSlide = Math.ceil(items.length / slideSize) - 1;
+
+      function updateSlot(slot, item) {
+        var video = slot.querySelector("video");
+        var title = slot.querySelector(".r2s2r-title");
+        var caption = slot.querySelector(".r2s2r-caption");
+
+        if (!item) {
+          slot.style.display = "none";
+          return;
+        }
+
+        slot.style.display = "block";
+        if (video) {
+          video.setAttribute("src", item.src);
+          video.load();
+        }
+        if (title) {
+          title.textContent = item.title;
+        }
+        if (caption) {
+          caption.textContent = item.caption;
+        }
+      }
+
+      function render() {
+        var start = slideIndex * slideSize;
+        updateSlot(slots[0], items[start]);
+        updateSlot(slots[1], items[start + 1]);
+      }
+
+      prevButton.addEventListener("click", function () {
+        slideIndex = (slideIndex - 1 + (maxSlide + 1)) % (maxSlide + 1);
+        render();
+      });
+
+      nextButton.addEventListener("click", function () {
+        slideIndex = (slideIndex + 1) % (maxSlide + 1);
+        render();
+      });
+
+      render();
+    })();
+  </script>
+  <script>
+    (function () {
+      var items = [
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/long_parkour1_with_terrain/long_parkour1.mp4",
+          title: "Long Parkour Sequence",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/long_parkour2_with_terrain/long_parkour2.mp4",
+          title: "Long Parkour Sequence",
+          caption: ""
+        },
+        {
+            src: "resources/meshmimic_videos/real2sim_videos/jump_across1.mp4",
+            title: "Jump Across",
+            caption: ""
+        },
+        {
+            src: "resources/meshmimic_videos/real2sim_videos/long_parkour4/long_parkour4.mp4",
+            title: "Long Parkour Sequence",
+            caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/long_parkour3_with_terrain/long_parkour3.mp4",
+          title: "Long Parkour Sequence",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/parkour1.mp4",
+          title: "Running Wall Backflip",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/parkour2.mp4",
+          title: "Running Wall Backflip",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/parkour4.mp4",
+          title: "Running Wall Backflip",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/parkour5.mp4",
+          title: "Running Wall Backflip",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/jump_across2.mp4",
+          title: "Jump Across",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/jump_across3.mp4",
+          title: "Jump Across",
+          caption: ""
+        },
+        {
+          src: "resources/meshmimic_videos/real2sim_videos/tic_tac1.mp4",
+          title: "Tic Tac",
+          caption: ""
+        }
+      ];
+
+      var prevButton = document.getElementById("r2s-prev");
+      var nextButton = document.getElementById("r2s-next");
+      var slots = document.querySelectorAll("#r2s-carousel .r2s2r-item");
+      if (!prevButton || !nextButton || slots.length === 0) {
+        return;
+      }
+
+      var slideSize = 2;
+      var slideIndex = 0;
+      var maxSlide = Math.ceil(items.length / slideSize) - 1;
+
+      function updateSlot(slot, item) {
+        var video = slot.querySelector("video");
+        var title = slot.querySelector(".r2s2r-title");
+        var caption = slot.querySelector(".r2s2r-caption");
+
+        if (!item) {
+          slot.style.display = "none";
+          return;
+        }
+
+        slot.style.display = "block";
+        if (video) {
+          video.setAttribute("src", item.src);
+          video.load();
+        }
+        if (title) {
+          title.textContent = item.title;
+        }
+        if (caption) {
+          caption.textContent = item.caption;
+        }
+      }
+
+      function render() {
+        var start = slideIndex * slideSize;
+        updateSlot(slots[0], items[start]);
+        updateSlot(slots[1], items[start + 1]);
+      }
+
+      prevButton.addEventListener("click", function () {
+        slideIndex = (slideIndex - 1 + (maxSlide + 1)) % (maxSlide + 1);
+        render();
+      });
+
+      nextButton.addEventListener("click", function () {
+        slideIndex = (slideIndex + 1) % (maxSlide + 1);
+        render();
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>
