@@ -358,6 +358,72 @@
       background: #4f46e5;
       cursor: pointer;
     }
+
+    .ic-thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.65rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .ic-thumb {
+      cursor: pointer;
+      text-align: center;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 3px solid transparent;
+      transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+      background: #fff;
+    }
+
+    .ic-thumb:hover {
+      border-color: #a5b4fc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .ic-thumb.is-active {
+      border-color: #4f46e5;
+      box-shadow: 0 4px 16px rgba(79,70,229,0.25);
+    }
+
+    .ic-thumb video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+      pointer-events: none;
+      background: #111;
+    }
+
+    .ic-thumb-label {
+      display: block;
+      font-size: 0.78rem;
+      color: #4b5563;
+      padding: 0.3rem 0;
+      font-weight: 600;
+    }
+
+    .ic-result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    @media (max-width: 768px) {
+      .ic-thumb-grid { grid-template-columns: repeat(3, 1fr); }
+      .ic-result-grid { grid-template-columns: 1fr; }
+    }
+
+    .ic-panel {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4/3;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
   </style>
 </head>
 
@@ -401,34 +467,6 @@
               Anonymous Submission
             </div>
 
-            <div class="column has-text-centered">
-              <div class="publication-links">
-                <span class="link-block">
-                  <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank">
-                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
-                    <span>Paper (Anonymous)</span>
-                  </a>
-                </span>
-                <span class="link-block">
-                  <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank">
-                    <span class="icon"><i class="ai ai-arxiv"></i></span>
-                    <span>arXiv (Anonymous)</span>
-                  </a>
-                </span>
-                <span class="link-block">
-                  <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank">
-                    <span class="icon"><i class="fab fa-github"></i></span>
-                    <span>Code (Coming Soon)</span>
-                  </a>
-                </span>
-                <span class="link-block">
-                  <a href="#" class="external-link button is-normal is-rounded is-dark" target="_blank">
-                    <span class="icon"><i class="fas fa-database"></i></span>
-                    <span>Data and Model (Coming Soon)</span>
-                  </a>
-                </span>
-              </div>
-            </div>
             <div class="has-text-centered" style="margin-top: 3.8rem;">
               <img src="resources/figures/cover.jpeg" alt="MeshMimic pipeline" style="width: 68%; height: auto; border-radius: 12px; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);">
             </div>
@@ -538,58 +576,68 @@
   </section>
 
   <!-- ════════════════════════════════════════════════════════════
-       Interactive 3D Viewer
+       Interactive Comparisons
        ════════════════════════════════════════════════════════════ -->
   <section class="section band band-b" id="interactive-comparison">
     <div class="container">
-      <h2 class="title is-2" style="text-align: center;">Interactive 3D Viewer</h2>
-      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 1.75rem; line-height: 1.7; text-align: center;">
-        Explore the reconstructed 3D scenes with animated human meshes from <strong>MeshMimic</strong>.<br>
-        Select a scene, <strong>orbit</strong> with left-drag, <strong>pan</strong> with right-drag, <strong>zoom</strong> with scroll.
+      <h2 class="title is-2" style="text-align: center;">Interactive Comparisons</h2>
+      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 1.25rem; line-height: 1.7; text-align: justify;">
+        Click a scene to compare <strong>MeshMimic (Ours)</strong> vs. <strong>VideoMimic</strong> on challenging in-the-wild monocular videos featuring high dynamics, severe occlusions, and complex human-scene interactions.
+        Both methods jointly reconstruct dynamic human meshes and static scene geometry from a single RGB video.
+        <strong>Orbit</strong> with left-drag, <strong>pan</strong> with right-drag, <strong>zoom</strong> with scroll.
       </p>
 
-      <!-- Scene selector buttons -->
-      <div id="ic-scene-buttons" style="display: flex; flex-wrap: wrap; gap: 0.65rem; justify-content: center; margin-bottom: 2rem;"></div>
+      <!-- Scene video thumbnails (2 rows × 5 cols) -->
+      <div id="ic-thumbnails" class="ic-thumb-grid"></div>
 
-      <!-- 3D Viewer -->
-      <div id="ic-viewer-wrap" style="position: relative; width: 100%; height: 520px; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(15,23,42,0.18); background: #1e1e2e;">
-        <div id="ic-viewer" style="width: 100%; height: 100%;"></div>
-        <div id="ic-viewer-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(30,30,46,0.92); color: #e2e8f0; font-size: 1.05rem; transition: opacity 0.35s; pointer-events: none;">
-          <svg id="ic-spinner" width="40" height="40" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
-            <circle cx="25" cy="25" r="20" fill="none" stroke="#818cf8" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
-          </svg>
-          <p id="ic-overlay-text" style="margin-top: 0.75rem;">Select a scene above to begin</p>
+      <!-- Two-column result display -->
+      <div id="ic-result" style="display: none;">
+        <div class="ic-result-grid">
+          <!-- Left: MeshMimic (Ours) -->
+          <div>
+            <div class="ic-panel" id="ic-viewer-wrap" style="background: #ffffff;">
+              <div id="ic-viewer" style="width: 100%; height: 100%;"></div>
+              <div id="ic-viewer-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); color: #374151; font-size: 0.95rem; transition: opacity 0.35s; pointer-events: none;">
+                <svg id="ic-spinner" width="36" height="36" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
+                  <circle cx="25" cy="25" r="20" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
+                </svg>
+                <p id="ic-overlay-text" style="margin-top: 0.6rem;">Loading&hellip;</p>
+              </div>
+            </div>
+            <p class="ic-col-label">MeshMimic (Ours)</p>
+          </div>
+          <!-- Right: VideoMimic -->
+          <div>
+            <div class="ic-panel" id="ic-videomimic-wrap" style="background: #ffffff;">
+              <div id="ic-viewer-vm" style="width: 100%; height: 100%;"></div>
+              <div id="ic-viewer-vm-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); color: #374151; font-size: 0.95rem; transition: opacity 0.35s; pointer-events: none;">
+                <svg id="ic-spinner-vm" width="36" height="36" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
+                  <circle cx="25" cy="25" r="20" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
+                </svg>
+                <p id="ic-overlay-vm-text" style="margin-top: 0.6rem;">Select a scene</p>
+              </div>
+            </div>
+            <p class="ic-col-label">VideoMimic</p>
+          </div>
+        </div>
+
+        <!-- Playback controls -->
+        <div id="ic-controls-bar" style="max-width: 100%; margin-top: 0.85rem; background: #fff; border-radius: 10px; padding: 0.75rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07);">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button class="ic-ctrl-btn" id="ic-btn-prev" title="Previous frame">&#9198;</button>
+            <button class="ic-ctrl-btn" id="ic-btn-play" title="Play / Pause">&#9208;</button>
+            <button class="ic-ctrl-btn" id="ic-btn-next" title="Next frame">&#9197;</button>
+            <input type="range" id="ic-timeline" min="0" max="0" value="0" style="flex: 1; cursor: pointer;">
+            <span id="ic-frame-info" style="min-width: 5.5rem; text-align: right; font-size: 0.85rem; color: #4b5563; font-variant-numeric: tabular-nums;">0 / 0</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.45rem;">
+            <span style="font-size: 0.82rem; color: #6b7280;">Speed</span>
+            <input type="range" id="ic-speed" min="1" max="60" value="10" style="width: 110px; cursor: pointer;">
+            <span id="ic-speed-label" style="font-size: 0.82rem; color: #4b5563; min-width: 3.5rem;">10 FPS</span>
+          </div>
         </div>
       </div>
 
-      <!-- Playback controls -->
-      <div id="ic-controls-bar" style="display: none; max-width: 100%; margin-top: 1rem; background: #fff; border-radius: 10px; padding: 0.85rem 1.1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07);">
-        <div style="display: flex; align-items: center; gap: 0.6rem;">
-          <button class="ic-ctrl-btn" id="ic-btn-prev" title="Previous frame">&#9198;</button>
-          <button class="ic-ctrl-btn" id="ic-btn-play" title="Play / Pause">&#9654;</button>
-          <button class="ic-ctrl-btn" id="ic-btn-next" title="Next frame">&#9197;</button>
-          <input type="range" id="ic-timeline" min="0" max="0" value="0" style="flex: 1; cursor: pointer;">
-          <span id="ic-frame-info" style="min-width: 6rem; text-align: right; font-size: 0.88rem; color: #4b5563; font-variant-numeric: tabular-nums;">0 / 0</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.55rem;">
-          <span style="font-size: 0.85rem; color: #6b7280;">Speed</span>
-          <input type="range" id="ic-speed" min="1" max="60" value="20" style="width: 130px; cursor: pointer;">
-          <span id="ic-speed-label" style="font-size: 0.85rem; color: #4b5563; min-width: 3.5rem;">20 FPS</span>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <section class="section band band-white" id="BibTeX">
-    <div class="container content">
-      <h2 class="titile">BibTeX</h2>
-      <pre><code>@misc{anonymous2026meshmimic,
-  title         = {MeshMimic: Geometry-Aware Humanoid Motion Learning through 3D Scene Reconstruction},
-  author        = {Anonymous Author(s)},
-  year          = {2026},
-  note          = {Anonymous submission}
-}</code></pre>
     </div>
   </section>
 
@@ -851,60 +899,80 @@
       render();
     })();
   </script>
-  <!-- ── Interactive 3D Viewer logic ─────────────────────────── -->
+  <!-- ── Interactive Comparisons logic ──────────────────────── -->
   <script type="module">
     import * as THREE from 'three';
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-    const SCENES = [
-      { id: 'EMDB_20', label: 'EMDB 20' },
-      { id: 'EMDB_27', label: 'EMDB 27' },
-      { id: 'EMDB_35', label: 'EMDB 35' },
-      { id: 'EMDB_36', label: 'EMDB 36' },
-      { id: 'EMDB_40', label: 'EMDB 40' },
-      { id: 'EMDB_48', label: 'EMDB 48' },
-      { id: 'EMDB_56', label: 'EMDB 56' },
-      { id: 'EMDB_58', label: 'EMDB 58' },
-      { id: 'parkour', label: 'Parkour' },
-      { id: 'ship_man', label: 'Ship Man' },
+    var SCENES = [
+      { id: 'parkour',      label: 'Parkour',      video: 'resources/comparison/video/parkour.mp4' },
+      { id: 'ship_man',     label: 'Ship Man',     video: 'resources/comparison/video/ship_man.mp4' },
+      { id: 'long_parkour', label: 'Long Parkour', video: 'resources/comparison/video/long_parkour.mp4' },
+      { id: 'EMDB_20',     label: 'EMDB 20',      video: 'resources/comparison/video/EMDB_20.mp4' },
+      { id: 'EMDB_27',     label: 'EMDB 27',      video: 'resources/comparison/video/EMDB_27.mp4' },
+      { id: 'EMDB_35',     label: 'EMDB 35',      video: 'resources/comparison/video/EMDB_35.mp4' },
+      { id: 'EMDB_36',     label: 'EMDB 36',      video: 'resources/comparison/video/EMDB_36.mp4' },
+      { id: 'EMDB_40',     label: 'EMDB 40',      video: 'resources/comparison/video/EMDB_40.mp4' },
+      { id: 'EMDB_48',     label: 'EMDB 48',      video: 'resources/comparison/video/EMDB_48.mp4' },
+      { id: 'EMDB_58',     label: 'EMDB 58',      video: 'resources/comparison/video/EMDB_58.mp4' },
     ];
 
     function npzUrl(id) {
       return 'resources/comparison/meshmimic/' + id + '.npz';
     }
 
+    function npzUrlVM(id) {
+      return 'resources/comparison/videomimic/' + id + '.npz';
+    }
+
+    var VM_SCENES = {
+      'parkour': true, 'ship_man': true, 'long_parkour': true,
+      'EMDB_20': true, 'EMDB_27': true, 'EMDB_35': true,
+      'EMDB_36': true, 'EMDB_40': true, 'EMDB_48': true, 'EMDB_58': true
+    };
+
+    var SAVED_CAMERAS = {
+      "parkour":{"pos":[0.3147,-1.0537,-1.8604],"target":[0.2282,-0.2963,-0.0060]},
+      "VM_parkour":{"pos":[1.6761,0.3699,3.4903],"target":[-0.6354,1.8601,-2.0006]},
+      "ship_man":{"pos":[-0.9216,-0.0766,-2.6546],"target":[0.4076,-0.0673,-0.1374]},
+      "VM_ship_man":{"pos":[-0.9648,0.1716,1.5059],"target":[-0.2948,-0.1713,-3.1180]},
+      "long_parkour":{"pos":[0.8886,0.1729,-2.1734],"target":[-0.2652,-0.3677,0.2574]},
+      "VM_long_parkour":{"pos":[-0.4197,1.0335,5.6593],"target":[0.5049,0.4101,-1.1614]},
+      "EMDB_20":{"pos":[-0.0299,-0.2260,-1.6583],"target":[-0.3287,0.0833,0.0683]},
+      "VM_EMDB_20":{"pos":[-0.8757,0.3756,6.7698],"target":[-3.6395,2.2001,-4.7851]},
+      "EMDB_27":{"pos":[1.0601,1.6744,-1.4500],"target":[0.5808,-0.1207,0.1089]},
+      "VM_EMDB_27":{"pos":[-4.3176,8.1514,-1.8383],"target":[-1.9284,-0.2305,-4.9883]},
+      "EMDB_35":{"pos":[1.4231,1.7892,-0.1691],"target":[-0.0624,-0.3036,0.2767]},
+      "VM_EMDB_35":{"pos":[5.5339,9.2953,-7.6669],"target":[2.6794,-1.3489,-0.1641]},
+      "EMDB_36":{"pos":[-1.6374,-0.0334,0.1110],"target":[-0.1210,-0.0172,0.1164]},
+      "VM_EMDB_36":{"pos":[11.2902,1.5305,-0.8858],"target":[0.4023,0.5653,-6.6447]},
+      "EMDB_40":{"pos":[-0.6896,2.7283,-0.5166],"target":[0.6518,-0.8020,-0.0869]},
+      "VM_EMDB_40":{"pos":[-0.8122,8.9813,-5.4965],"target":[-1.6227,0.2345,-5.4169]},
+      "EMDB_48":{"pos":[-0.1842,-0.2241,-1.6113],"target":[0.0271,-0.3864,0.0145]},
+      "VM_EMDB_48":{"pos":[-6.0120,1.4190,-1.2554],"target":[6.1327,-1.3840,-4.9135]},
+      "EMDB_58":{"pos":[0.1695,2.2391,0.4059],"target":[-0.1218,-0.0206,0.0570]},
+      "VM_EMDB_58":{"pos":[12.3336,15.1070,-6.5929],"target":[10.4492,-0.3398,-0.4452]}
+    };
+
     /* ── NPY binary parser ─────────────────────────────────── */
     function parseNpy(buf) {
       var dv = new DataView(buf);
       var major = dv.getUint8(6);
       var hdrLen, hdrOff;
-      if (major >= 2) {
-        hdrLen = dv.getUint32(8, true);
-        hdrOff = 12;
-      } else {
-        hdrLen = dv.getUint16(8, true);
-        hdrOff = 10;
-      }
+      if (major >= 2) { hdrLen = dv.getUint32(8, true); hdrOff = 12; }
+      else            { hdrLen = dv.getUint16(8, true); hdrOff = 10; }
       var hdr = new TextDecoder().decode(new Uint8Array(buf, hdrOff, hdrLen)).trim();
       var dataOff = hdrOff + hdrLen;
-
       var dm = hdr.match(/'descr'\s*:\s*'([^']+)'/);
       var sm = hdr.match(/'shape'\s*:\s*\(([^)]*)\)/);
       var descr = dm ? dm[1] : '';
       var shape = sm ? sm[1].split(',').map(function(s){return s.trim();}).filter(Boolean).map(Number) : [];
       var total = shape.length ? shape.reduce(function(a,b){return a*b;}, 1) : 1;
-
       var raw = buf.slice(dataOff);
-
-      if (descr === '<f4' || descr === '=f4')
-        return { shape: shape, data: new Float32Array(raw, 0, total) };
-      if (descr === '<f8' || descr === '=f8')
-        return { shape: shape, data: new Float64Array(raw, 0, total) };
-      if (descr === '<i4' || descr === '=i4')
-        return { shape: shape, data: new Int32Array(raw, 0, total) };
-      if (descr === '<u4' || descr === '=u4')
-        return { shape: shape, data: new Uint32Array(raw, 0, total) };
-
+      if (descr === '<f4' || descr === '=f4') return { shape: shape, data: new Float32Array(raw, 0, total) };
+      if (descr === '<f8' || descr === '=f8') return { shape: shape, data: new Float64Array(raw, 0, total) };
+      if (descr === '<i4' || descr === '=i4') return { shape: shape, data: new Int32Array(raw, 0, total) };
+      if (descr === '<u4' || descr === '=u4') return { shape: shape, data: new Uint32Array(raw, 0, total) };
       if (descr.match(/[<|=]U/)) {
         var cw = parseInt(descr.replace(/[<|=]U/, ''));
         var u32 = new Uint32Array(raw, 0, total * cw);
@@ -912,14 +980,11 @@
         for (var i = 0; i < u32.length; i++) { if (u32[i]) s += String.fromCodePoint(u32[i]); }
         return { shape: shape, data: s };
       }
-      if (descr.match(/[|<]S/)) {
+      if (descr.match(/[|<]S/))
         return { shape: shape, data: new TextDecoder().decode(new Uint8Array(raw, 0, total)).replace(/\0+$/, '') };
-      }
-
       return { shape: shape, data: new Uint8Array(raw, 0, total) };
     }
 
-    /* ── Parse a JSZip object into typed arrays ──────────── */
     async function parseZipToArrays(zip) {
       var arrays = {};
       var keys = Object.keys(zip.files);
@@ -928,12 +993,12 @@
         if (zip.files[name].dir) continue;
         var key = name.replace(/\.npy$/, '');
         var ab = await zip.files[name].async('arraybuffer');
-        try { arrays[key] = parseNpy(ab); } catch(e) { /* skip unparseable */ }
+        try { arrays[key] = parseNpy(ab); } catch(e) { /* skip */ }
       }
       return arrays;
     }
 
-    /* ── Load via fetch (works with HTTP server) ───────── */
+    /* ── Loaders ───────────────────────────────────────────── */
     async function loadViaFetch(url, onProgress) {
       var res = await fetch(url);
       if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -950,19 +1015,15 @@
       return await JSZip.loadAsync(new Blob(chunks));
     }
 
-    /* ── Load via <script> tag (works with file://) ────── */
     function loadViaScript(id) {
       return new Promise(function(resolve, reject) {
         var varName = '__NPZ_' + id;
         var script = document.createElement('script');
         script.src = 'resources/comparison/meshmimic/' + id + '.js';
         script.onload = function() {
-          var b64 = window[varName];
-          delete window[varName];
-          script.remove();
-          if (!b64) { reject(new Error('Data variable not found in js file')); return; }
-          var bin = atob(b64);
-          b64 = null;
+          var b64 = window[varName]; delete window[varName]; script.remove();
+          if (!b64) { reject(new Error('Data variable not found')); return; }
+          var bin = atob(b64); b64 = null;
           var buf = new Uint8Array(bin.length);
           for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
           bin = null;
@@ -970,24 +1031,45 @@
         };
         script.onerror = function() {
           script.remove();
-          reject(new Error(
-            'Cannot load scene data.\n' +
-            'Run: python resources/comparison/convert_for_web.py'
-          ));
+          reject(new Error('Cannot load data. Run: python resources/comparison/convert_for_web.py'));
         };
         document.head.appendChild(script);
       });
     }
 
-    /* ── Unified loader: fetch first, script-tag fallback ─ */
-    async function loadScene(id, onProgress) {
+    async function loadSceneData(id, onProgress) {
       var zip;
-      try {
-        zip = await loadViaFetch(npzUrl(id), onProgress);
-      } catch(e) {
-        if (onProgress) onProgress(-1);
-        zip = await loadViaScript(id);
-      }
+      try { zip = await loadViaFetch(npzUrl(id), onProgress); }
+      catch(e) { if (onProgress) onProgress(-1); zip = await loadViaScript(id); }
+      return await parseZipToArrays(zip);
+    }
+
+    function loadViaScriptVM(id) {
+      return new Promise(function(resolve, reject) {
+        var varName = '__NPZ_VM_' + id;
+        var script = document.createElement('script');
+        script.src = 'resources/comparison/videomimic/' + id + '.js';
+        script.onload = function() {
+          var b64 = window[varName]; delete window[varName]; script.remove();
+          if (!b64) { reject(new Error('VM data variable not found')); return; }
+          var bin = atob(b64); b64 = null;
+          var buf = new Uint8Array(bin.length);
+          for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+          bin = null;
+          JSZip.loadAsync(buf.buffer).then(resolve).catch(reject);
+        };
+        script.onerror = function() {
+          script.remove();
+          reject(new Error('Cannot load VideoMimic data'));
+        };
+        document.head.appendChild(script);
+      });
+    }
+
+    async function loadSceneDataVM(id, onProgress) {
+      var zip;
+      try { zip = await loadViaFetch(npzUrlVM(id), onProgress); }
+      catch(e) { if (onProgress) onProgress(-1); zip = await loadViaScriptVM(id); }
       return await parseZipToArrays(zip);
     }
 
@@ -995,30 +1077,43 @@
     class MeshViewer {
       constructor(container) {
         this.container = container;
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         this.renderer.setSize(container.clientWidth, container.clientHeight);
-        this.renderer.setClearColor(0x1e1e2e);
+        this.renderer.setClearColor(0xffffff);
         container.appendChild(this.renderer.domElement);
 
         this.scene3 = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.01, 500);
+        this.camera = new THREE.PerspectiveCamera(55, container.clientWidth / container.clientHeight, 0.001, 500);
+        this.camera.up.set(0, 1, 0);
 
-        this.scene3.add(new THREE.AmbientLight(0xffffff, 0.55));
-        var d1 = new THREE.DirectionalLight(0xffffff, 0.75);
+        this.scene3.add(new THREE.AmbientLight(0xffffff, 0.5));
+        this.scene3.add(new THREE.HemisphereLight(0xffffff, 0xe0e0e0, 1.2));
+        var d1 = new THREE.DirectionalLight(0xffffff, 1.0);
         d1.position.set(5, 10, 7);
         this.scene3.add(d1);
-        var d2 = new THREE.DirectionalLight(0xffffff, 0.35);
+        var d2 = new THREE.DirectionalLight(0xffffff, 0.7);
         d2.position.set(-5, 5, -5);
         this.scene3.add(d2);
+        var d3 = new THREE.DirectionalLight(0xffffff, 0.4);
+        d3.position.set(0, -5, 5);
+        this.scene3.add(d3);
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.12;
 
+        this._alignGroup = null;
+        this._alignQuat = new THREE.Quaternion();
         this.sceneMesh = null;
         this.humanMesh = null;
         this.humanVerts = null;
+        this.camR = null;
+        this.camT = null;
+        this.camTrajectory = null;
+        this.camFrustums = null;
+        this.currentCamFrustum = null;
+        this._curFrustScale = 0;
         this.numFrames = 0;
         this.numVerts = 0;
         this.frame = 0;
@@ -1032,16 +1127,26 @@
 
       load(arrays) {
         this._clear();
-
         var sv = arrays.scene_vertices.data;
         var sf = arrays.scene_faces.data;
         var hv = arrays.human_vertices.data;
         var hf = arrays.human_faces.data;
         var hvShape = arrays.human_vertices.shape;
-
         this.numFrames = hvShape[0];
         this.numVerts = hvShape[1];
         this.humanVerts = hv;
+
+        this.camR = null;
+        this.camT = null;
+        if (arrays.c2w_R && arrays.c2w_t) {
+          this.camR = arrays.c2w_R.data;
+          this.camT = arrays.c2w_t.data;
+        }
+
+        this._alignQuat = this._computeAlignQuat();
+        this._alignGroup = new THREE.Group();
+        this._alignGroup.quaternion.copy(this._alignQuat);
+        this.scene3.add(this._alignGroup);
 
         var sg = new THREE.BufferGeometry();
         sg.setAttribute('position', new THREE.Float32BufferAttribute(sv, 3));
@@ -1050,9 +1155,10 @@
         sg.setIndex(new THREE.BufferAttribute(sfU, 1));
         sg.computeVertexNormals();
         this.sceneMesh = new THREE.Mesh(sg, new THREE.MeshPhongMaterial({
-          color: 0xe6e6d2, side: THREE.DoubleSide
+          color: 0xdcdcc8, side: THREE.DoubleSide
         }));
-        this.scene3.add(this.sceneMesh);
+        this.sceneMesh.frustumCulled = false;
+        this._alignGroup.add(this.sceneMesh);
 
         var hg = new THREE.BufferGeometry();
         var posArr = new Float32Array(this.numVerts * 3);
@@ -1065,10 +1171,26 @@
         this.humanMesh = new THREE.Mesh(hg, new THREE.MeshPhongMaterial({
           color: 0x00bfff, side: THREE.DoubleSide
         }));
-        this.scene3.add(this.humanMesh);
+        this.humanMesh.frustumCulled = false;
+        this._alignGroup.add(this.humanMesh);
 
         this.frame = 0;
-        this._fitCamera();
+        this._buildCameraVis();
+        this._initCameraFromFrame0();
+      }
+
+      _computeAlignQuat() {
+        if (!this.camR) return new THREE.Quaternion();
+        var avgUp = new THREE.Vector3(0, 0, 0);
+        var N = this.numFrames;
+        for (var i = 0; i < N; i++) {
+          var ro = i * 9;
+          avgUp.x += -this.camR[ro + 1];
+          avgUp.y += -this.camR[ro + 4];
+          avgUp.z += -this.camR[ro + 7];
+        }
+        avgUp.divideScalar(N).normalize();
+        return new THREE.Quaternion().setFromUnitVectors(avgUp, new THREE.Vector3(0, 1, 0));
       }
 
       setFrame(idx) {
@@ -1081,37 +1203,152 @@
         for (var i = 0; i < n; i++) pos[i] = src[off + i];
         this.humanMesh.geometry.attributes.position.needsUpdate = true;
         this.humanMesh.geometry.computeVertexNormals();
+        this._updateCurrentFrustum(idx);
       }
 
-      _fitCamera() {
+      /* c2w_R is row-major (N,3,3): column j of frame i → indices [i*9+j, i*9+3+j, i*9+6+j] */
+      _frustumWorldPts(frameIdx, scale) {
+        var r = this.camR, t = this.camT;
+        var ro = frameIdx * 9, to = frameIdx * 3;
+        var cx = t[to], cy = t[to+1], cz = t[to+2];
+        var rx = r[ro],   ry = r[ro+3], rz = r[ro+6];
+        var dx = r[ro+1], dy = r[ro+4], dz = r[ro+7];
+        var fx = r[ro+2], fy = r[ro+5], fz = r[ro+8];
+        var d = scale, hw = scale * 0.35, hh = scale * 0.25;
+        return [
+          cx, cy, cz,
+          cx+fx*d-rx*hw-dx*hh, cy+fy*d-ry*hw-dy*hh, cz+fz*d-rz*hw-dz*hh,
+          cx+fx*d+rx*hw-dx*hh, cy+fy*d+ry*hw-dy*hh, cz+fz*d+rz*hw-dz*hh,
+          cx+fx*d+rx*hw+dx*hh, cy+fy*d+ry*hw+dy*hh, cz+fz*d+rz*hw+dz*hh,
+          cx+fx*d-rx*hw+dx*hh, cy+fy*d-ry*hw+dy*hh, cz+fz*d-rz*hw+dz*hh
+        ];
+      }
+
+      _buildCameraVis() {
+        this._clearCameraVis();
+        if (!this.camR || !this.camT || !this._alignGroup) return;
+        var N = this.numFrames;
         var box = new THREE.Box3();
         if (this.sceneMesh) box.expandByObject(this.sceneMesh);
         if (this.humanMesh) box.expandByObject(this.humanMesh);
-        var center = new THREE.Vector3();
-        box.getCenter(center);
-        var size = new THREE.Vector3();
-        box.getSize(size);
-        var maxDim = Math.max(size.x, size.y, size.z);
+        var sz = new THREE.Vector3(); box.getSize(sz);
+        var maxDim = Math.max(sz.x, sz.y, sz.z) || 1;
+        var fScale = maxDim * 0.022;
 
-        this.camera.position.set(center.x + maxDim * 0.9, center.y + maxDim * 0.6, center.z + maxDim * 0.9);
-        this.camera.near = maxDim * 0.001;
-        this.camera.far = maxDim * 20;
+        var trajPts = new Float32Array(N * 3);
+        for (var i = 0; i < N * 3; i++) trajPts[i] = this.camT[i];
+        var trajGeo = new THREE.BufferGeometry();
+        trajGeo.setAttribute('position', new THREE.Float32BufferAttribute(trajPts, 3));
+        this.camTrajectory = new THREE.Line(trajGeo, new THREE.LineBasicMaterial({
+          color: 0x90a4ae, transparent: true, opacity: 0.6
+        }));
+        this.camTrajectory.frustumCulled = false;
+        this._alignGroup.add(this.camTrajectory);
+
+        var step = Math.max(1, Math.floor(N / 20));
+        var verts = [], inds = [], vc = 0;
+        for (var i = 0; i < N; i += step) {
+          var pts = this._frustumWorldPts(i, fScale);
+          for (var j = 0; j < pts.length; j++) verts.push(pts[j]);
+          var b = vc;
+          inds.push(b,b+1, b,b+2, b,b+3, b,b+4, b+1,b+2, b+2,b+3, b+3,b+4, b+4,b+1);
+          vc += 5;
+        }
+        var fGeo = new THREE.BufferGeometry();
+        fGeo.setAttribute('position', new THREE.Float32BufferAttribute(verts, 3));
+        fGeo.setIndex(inds);
+        this.camFrustums = new THREE.LineSegments(fGeo, new THREE.LineBasicMaterial({
+          color: 0x90a4ae, transparent: true, opacity: 0.5
+        }));
+        this.camFrustums.frustumCulled = false;
+        this._alignGroup.add(this.camFrustums);
+
+        this._curFrustScale = fScale * 1.3;
+        var cp = this._frustumWorldPts(0, this._curFrustScale);
+        var cGeo = new THREE.BufferGeometry();
+        cGeo.setAttribute('position', new THREE.Float32BufferAttribute(cp, 3));
+        cGeo.setIndex([0,1, 0,2, 0,3, 0,4, 1,2, 2,3, 3,4, 4,1]);
+        this.currentCamFrustum = new THREE.LineSegments(cGeo, new THREE.LineBasicMaterial({ color: 0xef5350 }));
+        this.currentCamFrustum.frustumCulled = false;
+        this._alignGroup.add(this.currentCamFrustum);
+      }
+
+      _updateCurrentFrustum(frameIdx) {
+        if (!this.currentCamFrustum || !this.camR) return;
+        var pts = this._frustumWorldPts(frameIdx, this._curFrustScale);
+        var arr = this.currentCamFrustum.geometry.attributes.position.array;
+        for (var i = 0; i < pts.length; i++) arr[i] = pts[i];
+        this.currentCamFrustum.geometry.attributes.position.needsUpdate = true;
+      }
+
+      _clearCameraVis() {
+        [this.camTrajectory, this.camFrustums, this.currentCamFrustum].forEach(function(o) {
+          if (!o) return;
+          if (o.parent) o.parent.remove(o);
+          o.geometry.dispose();
+          o.material.dispose();
+        });
+        this.camTrajectory = null;
+        this.camFrustums = null;
+        this.currentCamFrustum = null;
+      }
+
+      _initCameraFromFrame0() {
+        var box = new THREE.Box3();
+        if (this.sceneMesh) box.expandByObject(this.sceneMesh);
+        if (this.humanMesh) box.expandByObject(this.humanMesh);
+        if (this.camTrajectory) box.expandByObject(this.camTrajectory);
+        var center = new THREE.Vector3(); box.getCenter(center);
+        var size = new THREE.Vector3(); box.getSize(size);
+        var maxDim = Math.max(size.x, size.y, size.z) || 1;
+
+        var halfFovRad = THREE.MathUtils.degToRad(this.camera.fov * 0.5);
+        var aspect = this.camera.aspect || 1;
+        var halfFovH = Math.atan(Math.tan(halfFovRad) * aspect);
+        var fitDist = (maxDim * 0.55) / Math.tan(Math.min(halfFovRad, halfFovH));
+
+        this.camera.up.set(0, 1, 0);
+
+        if (this.camR && this.camT) {
+          var cam0 = new THREE.Vector3(this.camT[0], this.camT[1], this.camT[2]);
+          cam0.applyQuaternion(this._alignQuat);
+          var dir = cam0.clone().sub(center);
+          if (dir.length() < 0.001) dir.set(0, 0.3, 1);
+          dir.normalize();
+          var camPos = center.clone().addScaledVector(dir, fitDist);
+        } else {
+          var camPos = center.clone();
+          camPos.x += maxDim * 1.0;
+          camPos.y += maxDim * 0.5;
+          camPos.z += maxDim * 0.6;
+        }
+
+        this.camera.position.copy(camPos);
+        this.camera.near = 0.001;
+        this.camera.far = maxDim * 50;
         this.camera.updateProjectionMatrix();
         this.controls.target.copy(center);
         this.controls.update();
       }
 
+
       _clear() {
-        var self = this;
+        this._clearCameraVis();
         [this.sceneMesh, this.humanMesh].forEach(function(m) {
           if (!m) return;
-          self.scene3.remove(m);
+          if (m.parent) m.parent.remove(m);
           m.geometry.dispose();
           m.material.dispose();
         });
+        if (this._alignGroup) {
+          this.scene3.remove(this._alignGroup);
+          this._alignGroup = null;
+        }
         this.sceneMesh = null;
         this.humanMesh = null;
         this.humanVerts = null;
+        this.camR = null;
+        this.camT = null;
       }
 
       _animate() {
@@ -1123,6 +1360,7 @@
       _onResize() {
         var w = this.container.clientWidth;
         var h = this.container.clientHeight;
+        if (w === 0 || h === 0) return;
         this.renderer.setSize(w, h);
         this.camera.aspect = w / h;
         this.camera.updateProjectionMatrix();
@@ -1140,7 +1378,8 @@
     }
 
     /* ── UI wiring ─────────────────────────────────────────── */
-    var btnBox      = document.getElementById('ic-scene-buttons');
+    var thumbBox    = document.getElementById('ic-thumbnails');
+    var resultDiv   = document.getElementById('ic-result');
     var viewerDiv   = document.getElementById('ic-viewer');
     var overlay     = document.getElementById('ic-viewer-overlay');
     var overlayText = document.getElementById('ic-overlay-text');
@@ -1154,38 +1393,90 @@
     var btnPlay     = document.getElementById('ic-btn-play');
     var btnNext     = document.getElementById('ic-btn-next');
 
+    var viewerVMDiv   = document.getElementById('ic-viewer-vm');
+    var overlayVM     = document.getElementById('ic-viewer-vm-overlay');
+    var overlayVMText = document.getElementById('ic-overlay-vm-text');
+    var spinnerVM     = document.getElementById('ic-spinner-vm');
+
     var viewer = null;
+    var viewerVM = null;
     var playing = false;
     var lastTick = 0;
     var currentId = null;
-    var activeBtn = null;
+    var activeThumb = null;
+    var thumbMap = {};
 
+    /* Build video thumbnails (2×5 grid) */
     SCENES.forEach(function(s) {
-      var btn = document.createElement('button');
-      btn.className = 'ic-scene-btn';
-      btn.textContent = s.label;
-      btn.addEventListener('click', function() { selectScene(s.id, btn); });
-      btnBox.appendChild(btn);
+      var thumb = document.createElement('div');
+      thumb.className = 'ic-thumb';
+
+      var vid = document.createElement('video');
+      vid.muted = true;
+      vid.preload = 'metadata';
+      vid.src = s.video + '#t=1';
+      vid.setAttribute('playsinline', '');
+      vid.loop = true;
+
+      var lbl = document.createElement('span');
+      lbl.className = 'ic-thumb-label';
+      lbl.textContent = s.label;
+
+      thumb.appendChild(vid);
+      thumb.appendChild(lbl);
+      thumb.addEventListener('click', function() { selectScene(s, thumb); });
+      thumbBox.appendChild(thumb);
+      thumbMap[s.id] = { thumb: thumb, vid: vid };
     });
 
-    async function selectScene(id, btn) {
-      if (currentId === id) return;
-      currentId = id;
-      playing = false;
-      btnPlay.innerHTML = '&#9654;';
+    function stopAllThumbVideos() {
+      Object.keys(thumbMap).forEach(function(k) {
+        var v = thumbMap[k].vid;
+        v.pause();
+        v.currentTime = 0;
+        v.style.pointerEvents = 'none';
+      });
+    }
 
-      if (activeBtn) activeBtn.classList.remove('is-active');
-      btn.classList.add('is-active');
-      activeBtn = btn;
+    async function selectScene(scene, thumb) {
+      if (currentId === scene.id) return;
+      currentId = scene.id;
+      playing = false;
+
+      if (activeThumb) activeThumb.classList.remove('is-active');
+      thumb.classList.add('is-active');
+      activeThumb = thumb;
+
+      stopAllThumbVideos();
+      var thumbVid = thumbMap[scene.id].vid;
+      thumbVid.style.pointerEvents = 'auto';
+      thumbVid.currentTime = 0;
+      thumbVid.play().catch(function(){});
+
+      resultDiv.style.display = 'block';
 
       overlay.style.opacity = '1';
       overlay.style.pointerEvents = 'auto';
       spinner.style.display = 'block';
-      overlayText.textContent = 'Loading scene\u2026';
+      overlayText.textContent = 'Loading\u2026';
+
+      var hasVM = VM_SCENES[scene.id] === true;
+      if (hasVM) {
+        overlayVM.style.opacity = '1';
+        overlayVM.style.pointerEvents = 'auto';
+        spinnerVM.style.display = 'block';
+        overlayVMText.textContent = 'Loading\u2026';
+      } else {
+        overlayVM.style.opacity = '1';
+        overlayVM.style.pointerEvents = 'auto';
+        spinnerVM.style.display = 'none';
+        overlayVMText.textContent = 'No data available';
+        if (viewerVM) { viewerVM.dispose(); viewerVM = null; }
+      }
 
       try {
-        var arrays = await loadScene(id, function(pct) {
-          if (pct < 0) { overlayText.textContent = 'Loading scene\u2026'; return; }
+        var arrays = await loadSceneData(scene.id, function(pct) {
+          if (pct < 0) { overlayText.textContent = 'Loading\u2026'; return; }
           overlayText.textContent = 'Loading\u2026 ' + Math.round(pct * 100) + '%';
         });
 
@@ -1194,33 +1485,77 @@
 
         if (!viewer) viewer = new MeshViewer(viewerDiv);
         viewer.load(arrays);
+        if (SAVED_CAMERAS[scene.id]) {
+          var sc = SAVED_CAMERAS[scene.id];
+          viewer.camera.position.set(sc.pos[0], sc.pos[1], sc.pos[2]);
+          viewer.controls.target.set(sc.target[0], sc.target[1], sc.target[2]);
+          viewer.controls.update();
+        }
 
         var nf = viewer.numFrames;
         timeline.max = Math.max(0, nf - 1);
         timeline.value = 0;
         frameInfo.textContent = '1 / ' + nf;
-        controlsBar.style.display = 'block';
+
+        playing = true;
+        btnPlay.innerHTML = '&#9208;';
+        lastTick = performance.now();
 
         overlay.style.opacity = '0';
         overlay.style.pointerEvents = 'none';
       } catch(err) {
         console.error(err);
         spinner.style.display = 'none';
-        var msg = err.message || String(err);
-        if (location.protocol === 'file:' && msg.indexOf('Cannot load') >= 0) {
-          overlayText.innerHTML = 'Missing .js data files.<br>' +
-            '<span style="font-size:0.88rem;opacity:0.8;">Run once:<br>' +
-            '<code style="background:rgba(255,255,255,0.12);padding:2px 8px;border-radius:4px;">python resources/comparison/convert_for_web.py</code></span>';
-        } else {
-          overlayText.textContent = 'Error: ' + msg;
+        overlayText.textContent = 'Error: ' + (err.message || String(err));
+      }
+
+      if (hasVM) {
+        try {
+          var arraysVM = await loadSceneDataVM(scene.id, function(pct) {
+            if (pct < 0) { overlayVMText.textContent = 'Loading\u2026'; return; }
+            overlayVMText.textContent = 'Loading\u2026 ' + Math.round(pct * 100) + '%';
+          });
+
+          overlayVMText.textContent = 'Building meshes\u2026';
+          await new Promise(function(r){ requestAnimationFrame(r); });
+
+          if (!viewerVM) viewerVM = new MeshViewer(viewerVMDiv);
+          viewerVM.load(arraysVM);
+          if (SAVED_CAMERAS['VM_' + scene.id]) {
+            var scv = SAVED_CAMERAS['VM_' + scene.id];
+            viewerVM.camera.position.set(scv.pos[0], scv.pos[1], scv.pos[2]);
+            viewerVM.controls.target.set(scv.target[0], scv.target[1], scv.target[2]);
+            viewerVM.controls.update();
+          }
+
+          overlayVM.style.opacity = '0';
+          overlayVM.style.pointerEvents = 'none';
+        } catch(err) {
+          console.error('VideoMimic error:', err);
+          spinnerVM.style.display = 'none';
+          overlayVMText.textContent = 'Error: ' + (err.message || String(err));
         }
       }
     }
+
+    /* Auto-select the first scene (Parkour) on load */
+    setTimeout(function() {
+      var first = SCENES[0];
+      selectScene(first, thumbMap[first.id].thumb);
+    }, 500);
 
     function syncUI() {
       if (!viewer) return;
       timeline.value = viewer.frame;
       frameInfo.textContent = (viewer.frame + 1) + ' / ' + viewer.numFrames;
+      syncVMFrame();
+    }
+
+    function syncVMFrame() {
+      if (!viewerVM || !viewer || viewerVM.numFrames === 0) return;
+      var ratio = viewer.frame / Math.max(1, viewer.numFrames - 1);
+      var vmFrame = Math.round(ratio * (viewerVM.numFrames - 1));
+      viewerVM.setFrame(vmFrame);
     }
 
     btnPlay.addEventListener('click', function() {
@@ -1247,9 +1582,11 @@
       syncUI();
     });
 
+
     speedSlider.addEventListener('input', function() {
       speedLabel.textContent = speedSlider.value + ' FPS';
     });
+
 
     (function tick() {
       requestAnimationFrame(tick);
