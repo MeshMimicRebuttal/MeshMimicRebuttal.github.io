@@ -428,25 +428,6 @@
 </head>
 
 <body>
-  <section class="hero is-link is-fullheight video" style="overflow: hidden; position:relative;">
-    <div class="hero-video" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 101%; height: 101%;">
-      <video id="hero-video" playsinline autoplay muted style="width: 100%; height: 100%; object-fit: cover; object-position: left top;">
-        <source src="resources/meshmimic_videos/real2sim2real_videos/climb_box7.mp4" type="video/mp4">
-      </video>
-    </div>
-
-    <div class="hero-body">
-      <div class="container has-text-centered">
-        <h1 class="title is-1 publication-title is-size-1-mobile" style="font-size: 6.6rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
-          <span class="brand-accent">MeshMimic</span>
-        </h1>
-        <h1 class="subtitle is-1 publication-title is-size-4-mobile" style="font-size: 3.6rem; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);">
-          Geometry-Aware Humanoid Motion Learning through 3D Scene Reconstruction
-        </h1>
-      </div>
-    </div>
-  </section>
-
   <section class="hero band band-white">
     <div class="hero-body">
       <div class="container is-fullhd">
@@ -467,27 +448,75 @@
               Anonymous Submission
             </div>
 
-            <div class="has-text-centered" style="margin-top: 3.8rem;">
-              <img src="resources/figures/cover.jpeg" alt="MeshMimic pipeline" style="width: 68%; height: auto; border-radius: 12px; box-shadow: 0 12px 28px rgba(15, 23, 42, 0.16);">
-            </div>
-            <p class="content" style="font-size: 1rem; color: #4b5563; max-width: 860px; margin: 0.9rem auto 0; line-height: 1.7; text-align: center;">
-              <b><i>MeshMimic</i></b>. In-the-wild monocular videos yield long-horizon motions over <b>complex terrains</b><br>
-              for contact-consistent motion–terrain interaction learning.
-            </p>
-            <div class="columns is-centered has-text-centered author-abstract">
-              <div class="column is-two-thirds">
-                <h2 class="title is-3">Abstract</h2>
-                <div class="content has-text-justified">
-                  <p>
-                    Humanoid motion control has witnessed significant breakthroughs in recent years, with deep reinforcement learning (RL) emerging as a primary catalyst for achieving complex, human-like behaviors. However, the high dimensionality and intricate dynamics of humanoid robots make manual motion design impractical, leading to a heavy reliance on expensive motion capture (MoCap) data. These datasets are not only costly to acquire but also frequently lack the necessary geometric context of the surrounding physical environment. Consequently, existing motion synthesis frameworks often suffer from a decoupling of motion and scene, resulting in physical inconsistencies such as contact slippage or mesh penetration during terrain-aware tasks.
-                    In this work, we present <b><i>MeshMimic</i></b>, an innovative framework that bridges 3D scene reconstruction and embodied intelligence to enable humanoid robots to learn coupled motion-terrain interactions directly from video. By leveraging state-of-the-art 3D vision models, our framework precisely segments and reconstructs both human trajectories and the underlying 3D geometry of terrains and objects. We introduce an optimization algorithm based on kinematic consistency to extract high-quality motion data from noisy visual reconstructions, alongside a contact-invariant retargeting method that transfers human-environment interaction features to the humanoid agent. Experimental results demonstrate that MeshMimic achieves robust, highly dynamic performance across diverse and challenging terrains. Our approach proves that a low-cost pipeline utilizing only consumer-grade monocular sensors can facilitate the training of complex physical interactions, enabling scalable learning in unstructured environments.
-                  </p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ════════════════════════════════════════════════════════════
+       Interactive Comparisons
+       ════════════════════════════════════════════════════════════ -->
+  <section class="section band band-b" id="interactive-comparison">
+    <div class="container">
+      <h2 class="title is-2" style="text-align: center;">Interactive Comparisons</h2>
+      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 1.25rem; line-height: 1.7; text-align: justify;">
+        Click a scene to compare <strong>MeshMimic (Ours)</strong> vs. <strong>VideoMimic</strong> on challenging in-the-wild monocular videos featuring high dynamics, severe occlusions, and complex human-scene interactions.
+        Both methods jointly reconstruct dynamic human meshes and static scene geometry from a single RGB video.
+        <strong>Orbit</strong> with left-drag, <strong>pan</strong> with right-drag, <strong>zoom</strong> with scroll.
+      </p>
+
+      <!-- Scene video thumbnails (2 rows × 5 cols) -->
+      <div id="ic-thumbnails" class="ic-thumb-grid"></div>
+
+      <!-- Two-column result display -->
+      <div id="ic-result" style="display: none;">
+        <div class="ic-result-grid">
+          <!-- Left: MeshMimic (Ours) -->
+          <div>
+            <div class="ic-panel" id="ic-viewer-wrap" style="background: #ffffff;">
+              <div id="ic-viewer" style="width: 100%; height: 100%;"></div>
+              <div id="ic-viewer-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); color: #374151; font-size: 0.95rem; transition: opacity 0.35s; pointer-events: none;">
+                <svg id="ic-spinner" width="36" height="36" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
+                  <circle cx="25" cy="25" r="20" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
+                </svg>
+                <p id="ic-overlay-text" style="margin-top: 0.6rem;">Loading&hellip;</p>
+              </div>
+            </div>
+            <p class="ic-col-label">MeshMimic (Ours)</p>
+          </div>
+          <!-- Right: VideoMimic -->
+          <div>
+            <div class="ic-panel" id="ic-videomimic-wrap" style="background: #ffffff;">
+              <div id="ic-viewer-vm" style="width: 100%; height: 100%;"></div>
+              <div id="ic-viewer-vm-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); color: #374151; font-size: 0.95rem; transition: opacity 0.35s; pointer-events: none;">
+                <svg id="ic-spinner-vm" width="36" height="36" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
+                  <circle cx="25" cy="25" r="20" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
+                </svg>
+                <p id="ic-overlay-vm-text" style="margin-top: 0.6rem;">Select a scene</p>
+              </div>
+            </div>
+            <p class="ic-col-label">VideoMimic</p>
+          </div>
+        </div>
+
+        <!-- Playback controls -->
+        <div id="ic-controls-bar" style="max-width: 100%; margin-top: 0.85rem; background: #fff; border-radius: 10px; padding: 0.75rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07);">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <button class="ic-ctrl-btn" id="ic-btn-prev" title="Previous frame">&#9198;</button>
+            <button class="ic-ctrl-btn" id="ic-btn-play" title="Play / Pause">&#9208;</button>
+            <button class="ic-ctrl-btn" id="ic-btn-next" title="Next frame">&#9197;</button>
+            <input type="range" id="ic-timeline" min="0" max="0" value="0" style="flex: 1; cursor: pointer;">
+            <span id="ic-frame-info" style="min-width: 5.5rem; text-align: right; font-size: 0.85rem; color: #4b5563; font-variant-numeric: tabular-nums;">0 / 0</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.45rem;">
+            <span style="font-size: 0.82rem; color: #6b7280;">Speed</span>
+            <input type="range" id="ic-speed" min="1" max="60" value="10" style="width: 110px; cursor: pointer;">
+            <span id="ic-speed-label" style="font-size: 0.82rem; color: #4b5563; min-width: 3.5rem;">10 FPS</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -575,72 +604,6 @@
     </div>
   </section>
 
-  <!-- ════════════════════════════════════════════════════════════
-       Interactive Comparisons
-       ════════════════════════════════════════════════════════════ -->
-  <section class="section band band-b" id="interactive-comparison">
-    <div class="container">
-      <h2 class="title is-2" style="text-align: center;">Interactive Comparisons</h2>
-      <p style="font-size: 1rem; color: #5b6472; max-width: 860px; margin: 0.75rem auto 1.25rem; line-height: 1.7; text-align: justify;">
-        Click a scene to compare <strong>MeshMimic (Ours)</strong> vs. <strong>VideoMimic</strong> on challenging in-the-wild monocular videos featuring high dynamics, severe occlusions, and complex human-scene interactions.
-        Both methods jointly reconstruct dynamic human meshes and static scene geometry from a single RGB video.
-        <strong>Orbit</strong> with left-drag, <strong>pan</strong> with right-drag, <strong>zoom</strong> with scroll.
-      </p>
-
-      <!-- Scene video thumbnails (2 rows × 5 cols) -->
-      <div id="ic-thumbnails" class="ic-thumb-grid"></div>
-
-      <!-- Two-column result display -->
-      <div id="ic-result" style="display: none;">
-        <div class="ic-result-grid">
-          <!-- Left: MeshMimic (Ours) -->
-          <div>
-            <div class="ic-panel" id="ic-viewer-wrap" style="background: #ffffff;">
-              <div id="ic-viewer" style="width: 100%; height: 100%;"></div>
-              <div id="ic-viewer-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); color: #374151; font-size: 0.95rem; transition: opacity 0.35s; pointer-events: none;">
-                <svg id="ic-spinner" width="36" height="36" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
-                  <circle cx="25" cy="25" r="20" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
-                </svg>
-                <p id="ic-overlay-text" style="margin-top: 0.6rem;">Loading&hellip;</p>
-              </div>
-            </div>
-            <p class="ic-col-label">MeshMimic (Ours)</p>
-          </div>
-          <!-- Right: VideoMimic -->
-          <div>
-            <div class="ic-panel" id="ic-videomimic-wrap" style="background: #ffffff;">
-              <div id="ic-viewer-vm" style="width: 100%; height: 100%;"></div>
-              <div id="ic-viewer-vm-overlay" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,255,255,0.92); color: #374151; font-size: 0.95rem; transition: opacity 0.35s; pointer-events: none;">
-                <svg id="ic-spinner-vm" width="36" height="36" viewBox="0 0 50 50" style="animation: ic-spin 1s linear infinite; display: none;">
-                  <circle cx="25" cy="25" r="20" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray="80 40" stroke-linecap="round"/>
-                </svg>
-                <p id="ic-overlay-vm-text" style="margin-top: 0.6rem;">Select a scene</p>
-              </div>
-            </div>
-            <p class="ic-col-label">VideoMimic</p>
-          </div>
-        </div>
-
-        <!-- Playback controls -->
-        <div id="ic-controls-bar" style="max-width: 100%; margin-top: 0.85rem; background: #fff; border-radius: 10px; padding: 0.75rem 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07);">
-          <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <button class="ic-ctrl-btn" id="ic-btn-prev" title="Previous frame">&#9198;</button>
-            <button class="ic-ctrl-btn" id="ic-btn-play" title="Play / Pause">&#9208;</button>
-            <button class="ic-ctrl-btn" id="ic-btn-next" title="Next frame">&#9197;</button>
-            <input type="range" id="ic-timeline" min="0" max="0" value="0" style="flex: 1; cursor: pointer;">
-            <span id="ic-frame-info" style="min-width: 5.5rem; text-align: right; font-size: 0.85rem; color: #4b5563; font-variant-numeric: tabular-nums;">0 / 0</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.45rem;">
-            <span style="font-size: 0.82rem; color: #6b7280;">Speed</span>
-            <input type="range" id="ic-speed" min="1" max="60" value="10" style="width: 110px; cursor: pointer;">
-            <span id="ic-speed-label" style="font-size: 0.82rem; color: #4b5563; min-width: 3.5rem;">10 FPS</span>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
   <footer class="footer">
     <div class="container">
       <div class="content has-text-centered">
@@ -650,71 +613,11 @@
   </footer>
   <script>
     (function () {
-      var heroVideo = document.getElementById("hero-video");
-      if (!heroVideo) {
-        return;
-      }
-
-      var playlist = [
-        "resources/meshmimic_videos/real2sim2real_videos/climb_box7.mp4",
-        "resources/meshmimic_videos/real2sim2real_videos/climb_box8.mp4",
-        "resources/meshmimic_videos/real2sim2real_videos/jump_box9.mp4",
-        "resources/meshmimic_videos/real2sim2real_videos/odin_jcv3.mp4",
-        "resources/meshmimic_videos/real2sim2real_videos/safety_vault10.mp4"
-      ];
-
-      var currentIndex = 0;
-
-      function loadVideo(index) {
-        heroVideo.pause();
-        heroVideo.setAttribute("src", playlist[index]);
-        heroVideo.load();
-        heroVideo.play().catch(function () {
-          // Autoplay might be blocked on some browsers.
-        });
-      }
-
-      heroVideo.addEventListener("ended", function () {
-        currentIndex = (currentIndex + 1) % playlist.length;
-        loadVideo(currentIndex);
-      });
-
-      heroVideo.addEventListener("error", function () {
-        currentIndex = (currentIndex + 1) % playlist.length;
-        loadVideo(currentIndex);
-      });
-
-      heroVideo.removeAttribute("loop");
-      loadVideo(currentIndex);
-    })();
-  </script>
-  <script>
-    (function () {
       var items = [
         {
           src: "resources/meshmimic_videos/real2sim2real_videos3/jump_box9_real2sim2real.mp4",
           title: "Jump Box2 (JB2)",
           caption: "Jump Box2 (JB2): running single-leg jump onto a 40 cm box and drop down."
-        },
-        {
-          src: "resources/meshmimic_videos/real2sim2real_videos3/odin_jcv3_real2sim2real.mp4",
-          title: "Jump Climb Down1 (JCD1)",
-          caption: "Jump Climb Down1 (JCD1): jump onto a 20 cm box, climb onto a 60 cm box, and descend using single-hand support."
-        },
-        {
-          src: "resources/meshmimic_videos/real2sim2real_videos3/climb_box7_real2sim2real.mp4",
-          title: "Jump Box1 (JB1)",
-          caption: "Jump Box1 (JB1): jump onto a 40 cm box."
-        },
-        {
-          src: "resources/meshmimic_videos/real2sim2real_videos3/climb_box8_real2sim2real.mp4",
-          title: "Climb Box2 (CB2)",
-          caption: "Climb Box2 (CB2): side climb onto a 60 cm box."
-        },
-        {
-          src: "resources/meshmimic_videos/real2sim2real_videos3/safety_vault10_real2sim2real.mp4",
-          title: "Safety Vault2 (SV2)",
-          caption: "Safety Vault2 (SV2): double-hand safety vault over a 40 cm box."
         },
         {
           src: "resources/meshmimic_videos/real2sim2real_videos3/climb_box3_real2sim2real.mp4",
